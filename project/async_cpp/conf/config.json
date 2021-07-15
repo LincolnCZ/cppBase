@@ -1,0 +1,23 @@
+{
+    "rabbitmq": {
+        "host": "221.228.110.107",
+        "port": 5672,
+        "user": "as_admin",
+        "pwd": "as_admin",
+        "vhost": "/task",
+        "queue": "52d245c0f4d6fc70418c5a18",
+        "xxxqueue": "test"
+    },
+    "server": {
+        "taskid": "52d245c0f4d6fc70418c5a18",
+		"workthreadsnum": 5
+    },
+   "staticservers": ["221.228.91.160:9523"],
+   "downloadproxy": {
+        "http": "biugo-proxy.yy.com:8080",
+        "https": "biugo-proxy.yy.com:8081"
+    },
+    "metrics": {
+        "servicename": "aladdin_picture_to_cartoon"
+    }
+}

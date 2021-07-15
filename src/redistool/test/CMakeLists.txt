@@ -1,0 +1,4 @@
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+add_executable(cppbase_redistool_test main.cpp)
+target_link_libraries(cppbase_redistool_test cppbase_redistool pthread)

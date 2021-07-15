@@ -1,0 +1,9 @@
+prefix=/data/kafka_gcc4.8/
+libdir=/data/kafka_gcc4.8//lib
+includedir=/data/kafka_gcc4.8//include
+
+Name: librdkafka++-static
+Description: The Apache Kafka C/C++ library (static)
+Version: 1.3.0
+Cflags: -I${includedir}
+Libs: -L${libdir} ${libdir}/librdkafka++.a -L../src -lrdkafka -lstdc++

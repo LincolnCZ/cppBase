@@ -1,0 +1,26 @@
+git clone https://github.com/google/googletest.git -b release-1.10.0
+
+安装步骤：
+
+```
+git clone https://github.com/google/googletest.git -b release-1.10.0
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=./_install
+make && make install
+```
+执行以上命令后将会在_install目录下看到编译产出的文件了。
+
+```
+.
+├── include
+│   ├── gmock
+│   └── gtest
+└── lib
+    ├── cmake
+    ├── libgmock.a
+    ├── libgmock_main.a
+    ├── libgtest.a
+    ├── libgtest_main.a
+    └── pkgconfig
+```
