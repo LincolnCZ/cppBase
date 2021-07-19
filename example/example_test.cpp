@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <openssl/md5.h>
+#include <set>
 
 using namespace std;
 
@@ -22,6 +23,24 @@ static string md5_string(const string &content) {
     return dumpHexString(result, MD5_DIGEST_LENGTH);
 }
 
+
+static uint64_t str2ull(std::string strInput) {
+    uint64_t res = 0ull;
+    const char *start = strInput.c_str();
+    const char *end = start + strInput.size();
+    for (const char *p = start; p < end; p++) {
+        if (*p >= '0' && *p <= '9') {
+            res = res * 10 + (*p - '0');
+        } else {
+            break;
+        }
+    }
+    return res;
+}
+
 int main() {
-    cout << md5_string("20313521") << endl;
+    string t1("a1bcd3");
+    cout << str2ull(t1) << endl;
+    string t2("adfadf");
+    cout << str2ull(t2) << endl;
 }

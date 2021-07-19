@@ -32,12 +32,17 @@ target_include_directories(cppbase_redistool PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> ${PROJECT_SOURCE_DIR}/3rd)
 target_link_libraries(cppbase_redistool cppbase_core cppbase_utility hiredis event pthread)
 
-# example
-add_subdirectory(example)
-
 # test
 if (CPPBASE_TEST)
 #    add_subdirectory(src/utility/test)
-    add_subdirectory(src/redistool/test)
-    add_subdirectory(project/center_config)
+#    add_subdirectory(src/redistool/test)
 endif ()
+
+# example
+add_subdirectory(example)
+
+# center_config
+#add_subdirectory(project/center_config)
+
+# design pattern
+add_subdirectory(project/design_pattern)

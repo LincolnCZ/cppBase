@@ -15,4 +15,6 @@ add_example_target(test)
 
 #stl
 add_subdirectory(stl)
+
 add_subdirectory(batchWork)
+add_subdirectory(smart_pointer)
