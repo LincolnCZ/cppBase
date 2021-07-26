@@ -5,8 +5,7 @@
 #include "anim_util.h"
 #include "image_enc.h"
 
-class WriteMemoryFile
-{
+class WriteMemoryFile {
 public:
     WriteMemoryFile() {
         buf_ = nullptr;
@@ -15,17 +14,19 @@ public:
     }
 
     ~WriteMemoryFile() {
-        if(fp_ != nullptr) {
+        if (fp_ != nullptr) {
             fclose(fp_);
             fp_ = nullptr;
         }
-        if(buf_ != nullptr) {
+        if (buf_ != nullptr) {
             free(buf_);
             buf_ = nullptr;
         }
     }
-    WriteMemoryFile(const WriteMemoryFile&) = delete;
-    WriteMemoryFile &operator=(const WriteMemoryFile&) = delete;
+
+    WriteMemoryFile(const WriteMemoryFile &) = delete;
+
+    WriteMemoryFile &operator=(const WriteMemoryFile &) = delete;
 
     FILE *open() {
         assert(fp_ == nullptr);
@@ -53,21 +54,20 @@ private:
     FILE *fp_;
 };
 
-int splitImageWebp(const char *file, const std::string &input, std::vector<std::string> &imgs)
-{
+int splitImageWebp(const char *file, const std::string &input, std::vector<std::string> &imgs) {
     imgs.clear();
 
     // 解码 webp 图片
     WebPData webp_data;
     WebPDataInit(&webp_data);
-    uint8_t* file_data = (uint8_t*)WebPMalloc(input.size());
+    uint8_t *file_data = (uint8_t *) WebPMalloc(input.size());
     memcpy(file_data, input.data(), input.size());
     webp_data.bytes = file_data;
     webp_data.size = input.size();
 
     AnimatedImage image;
     memset(&image, 0, sizeof(image));
-    if(!ReadAnimatedImage(file, &webp_data ,&image)) {
+    if (!ReadAnimatedImage(file, &webp_data, &image)) {
         FUNLOG(Warn, "%s, decode webp image fail", file);
         WebPDataClear(&webp_data);
         return 1;
@@ -76,7 +76,7 @@ int splitImageWebp(const char *file, const std::string &input, std::vector<std::
 
     // 编码每一帧结果到png格式
     int result = 0;
-    for(uint32_t i = 0; i < image.num_frames; ++i) {
+    for (uint32_t i = 0; i < image.num_frames; ++i) {
         WebPDecBuffer buffer;
         WebPInitDecBuffer(&buffer);
         buffer.colorspace = MODE_RGBA;
@@ -88,7 +88,7 @@ int splitImageWebp(const char *file, const std::string &input, std::vector<std::
         buffer.u.RGBA.size = buffer.u.RGBA.stride * buffer.height;
 
         WriteMemoryFile wfile;
-        if(!WebPWritePNG(wfile.open(), &buffer)) {
+        if (!WebPWritePNG(wfile.open(), &buffer)) {
             FUNLOG(Error, "%s, write png index %d fail", file, i);
             wfile.close();
             WebPFreeDecBuffer(&buffer);

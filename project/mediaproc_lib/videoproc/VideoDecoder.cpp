@@ -1,49 +1,43 @@
 #undef __CLASS__
 #define __CLASS__ "CVideoDecoder"
+
 #include "VideoDecoder.h"
 #include "core/logger.h"
 
-CVideoDecoder::CVideoDecoder(std::string taskId)
-{
+CVideoDecoder::CVideoDecoder(std::string taskId) {
     m_pCodecCtx = NULL;
     m_taskId = taskId;
     m_decoderInFrames = 0;
     m_decoderOutFrames = 0;
 }
 
-CVideoDecoder::~CVideoDecoder()
-{
+CVideoDecoder::~CVideoDecoder() {
     release();
 }
 
-int CVideoDecoder::init(AVCodecParameters* codecpar)
-{
-    if (m_pCodecCtx != NULL)
-    {
+int CVideoDecoder::init(AVCodecParameters *codecpar) {
+    if (m_pCodecCtx != NULL) {
         FUNLOG(Warn, "%s Video decoder already initialized", m_taskId.c_str());
         return -1;
     }
 
     AVCodecID avCodecId = codecpar->codec_id;
     AVCodec *pDecoder = avcodec_find_decoder(avCodecId);
-    if(pDecoder == NULL)
-    {
-        FUNLOG(Error,"%s Decoder %u not found", m_taskId.c_str(), avCodecId);
+    if (pDecoder == NULL) {
+        FUNLOG(Error, "%s Decoder %u not found", m_taskId.c_str(), avCodecId);
         return -1;
     }
 
     m_pCodecCtx = avcodec_alloc_context3(pDecoder);
-    if (m_pCodecCtx == NULL)
-    {
+    if (m_pCodecCtx == NULL) {
         FUNLOG(Error, "%s Failed to allocate avcodec context", m_taskId.c_str());
         return -1;
     }
     avcodec_parameters_to_context(m_pCodecCtx, codecpar);
 
     m_pCodecCtx->thread_count = 1;
-    if(avcodec_open2(m_pCodecCtx, pDecoder, NULL) < 0)
-    {
-        FUNLOG(Error,"%s Failed to open avcodec", m_taskId.c_str());
+    if (avcodec_open2(m_pCodecCtx, pDecoder, NULL) < 0) {
+        FUNLOG(Error, "%s Failed to open avcodec", m_taskId.c_str());
         avcodec_free_context(&m_pCodecCtx);
         return -1;
     }
@@ -54,8 +48,7 @@ int CVideoDecoder::init(AVCodecParameters* codecpar)
     return 0;
 }
 
-void CVideoDecoder::release()
-{
+void CVideoDecoder::release() {
     if (m_pCodecCtx != NULL) {
         FUNLOG(Notice, "%s Video decoder released", m_taskId.c_str());
         avcodec_free_context(&m_pCodecCtx);
@@ -63,15 +56,14 @@ void CVideoDecoder::release()
     }
 }
 
-int CVideoDecoder::decodeFrame(AVPacket* pkt, AVFrame* outFrame)
-{
+int CVideoDecoder::decodeFrame(AVPacket *pkt, AVFrame *outFrame) {
     if (m_pCodecCtx == NULL || outFrame == NULL) {
         FUNLOG(Error, "%s m_pCodecCtx == NULL || outFrame == NULL", m_taskId.c_str());
-        return - 1;
+        return -1;
     }
 
     // wait for first IFrame
-    if ((AV_PKT_FLAG_KEY != (pkt->flags&AV_PKT_FLAG_KEY)) && m_decoderInFrames == 0) {
+    if ((AV_PKT_FLAG_KEY != (pkt->flags & AV_PKT_FLAG_KEY)) && m_decoderInFrames == 0) {
         FUNLOG(Error, "%s not I frame first!", m_taskId.c_str());
         return -2;
     }
@@ -79,7 +71,7 @@ int CVideoDecoder::decodeFrame(AVPacket* pkt, AVFrame* outFrame)
     int gotFrame = 0;
     m_decoderInFrames++;
     int err = avcodec_decode_video2(m_pCodecCtx, outFrame, &gotFrame, pkt);
-    if(err < 0) {
+    if (err < 0) {
         FUNLOG(Error, "%s decode video error %d", m_taskId.c_str(), err);
         return -3;
     }
@@ -87,8 +79,7 @@ int CVideoDecoder::decodeFrame(AVPacket* pkt, AVFrame* outFrame)
     return gotFrame;
 }
 
-int CVideoDecoder::flushDecoder(AVFrame* outFrame)
-{
+int CVideoDecoder::flushDecoder(AVFrame *outFrame) {
     if (m_pCodecCtx == NULL || outFrame == NULL)
         return -1;
 

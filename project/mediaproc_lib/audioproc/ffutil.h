@@ -10,7 +10,8 @@ extern "C" {
 #include <libavutil/audio_fifo.h>
 #include <libswresample/swresample.h>
 
-extern int open_codec_context(int *stream_idx, AVFormatContext *fmt_ctx, AVCodecContext **codec_ctx, enum AVMediaType type);
+extern int
+open_codec_context(int *stream_idx, AVFormatContext *fmt_ctx, AVCodecContext **codec_ctx, enum AVMediaType type);
 
 // copy from ffmpeg example
 

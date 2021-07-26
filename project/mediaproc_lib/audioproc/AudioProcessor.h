@@ -1,9 +1,9 @@
 #pragma once
+
 #include <string>
 #include <vector>
 
-class AudioProcessor
-{
+class AudioProcessor {
 public:
     AudioProcessor();
     ~AudioProcessor();

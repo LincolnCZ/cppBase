@@ -41,7 +41,7 @@ endif ()
 #-------------------------------------end--------------------------------------
 
 # example
-add_subdirectory(example)
+#add_subdirectory(example)
 
 # center_config
 #add_subdirectory(project/center_config)
