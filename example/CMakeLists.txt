@@ -12,6 +12,7 @@ add_example_target(std_function)
 add_example_target(file)
 add_example_target(md5)
 add_example_target(test)
+add_example_target(test2)
 
 #stl
 add_subdirectory(stl)

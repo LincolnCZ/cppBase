@@ -12,6 +12,7 @@ if(CPPBASE_TEST)
     add_definitions(-DLOGGER_USING_PRINT)
 endif()
 
+#-----------------------------------基础模块start---------------------------------
 # cppbase_utility
 aux_source_directory(src/utility UTILITY_SRC)
 add_library(cppbase_utility ${UTILITY_SRC})
@@ -37,6 +38,7 @@ if (CPPBASE_TEST)
 #    add_subdirectory(src/utility/test)
 #    add_subdirectory(src/redistool/test)
 endif ()
+#-------------------------------------end--------------------------------------
 
 # example
 add_subdirectory(example)
@@ -44,5 +46,8 @@ add_subdirectory(example)
 # center_config
 #add_subdirectory(project/center_config)
 
+# mediaproc_lib
+add_subdirectory(project/mediaproc_lib)
+
 # design pattern
-add_subdirectory(project/design_pattern)
+#add_subdirectory(project/design_pattern)
