@@ -7,8 +7,7 @@ extern "C" {
 
 // 只读内存模拟
 // 不保存所读取内容，因此不需要进行内存拷贝。使用input内存必须在其使用过程中一直存在
-class AVIOReadMemory
-{
+class AVIOReadMemory {
 public:
     AVIOReadMemory(const char *input, int size);
     ~AVIOReadMemory();
@@ -29,8 +28,7 @@ private:
     int pos;
 };
 
-class AVIOMemory
-{
+class AVIOMemory {
 public:
     AVIOMemory();
     ~AVIOMemory();

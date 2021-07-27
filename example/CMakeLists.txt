@@ -17,5 +17,6 @@ add_example_target(test2)
 #stl
 add_subdirectory(stl)
 
-add_subdirectory(batchWork)
-add_subdirectory(smart_pointer)
+#add_subdirectory(batchWork)
+#add_subdirectory(smart_pointer)
+add_subdirectory(ffmpeg_3.4.7_examples)
