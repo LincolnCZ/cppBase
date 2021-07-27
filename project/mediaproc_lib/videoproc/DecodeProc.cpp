@@ -8,7 +8,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-#include "Decode.h"
+#include "DecodeProc.h"
 #include "VideoDecoder.h"
 #include "ImageEncoder.h"
 

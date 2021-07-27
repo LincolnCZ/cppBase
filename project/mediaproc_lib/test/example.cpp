@@ -5,7 +5,7 @@
 #include <vector>
 #include <unistd.h>
 #include "audioproc/AudioProcessor.h"
-#include "videoproc/Decode.h"
+#include "videoproc/DecodeProc.h"
 #include "imageproc/imageproc.h"
 #include "core/logger.h"
 #include "core/utils.h"
@@ -210,6 +210,7 @@ int main(int argc, char **argv) {
         return 0;
     }
     const char *cmd = argv[1];
+        // 音频处理
     if (strcmp(cmd, "decode") == 0) {
         cmdDecode(argc, argv);
     } else if (strcmp(cmd, "split") == 0) {
@@ -219,8 +220,10 @@ int main(int argc, char **argv) {
     } else if (strcmp(cmd, "error") == 0) {
         cmdError(argc, argv);
     } else if (strcmp(cmd, "screenshot") == 0) {
+        // 视频处理
         cmdScreenShot(argc, argv);
     } else if (strcmp(cmd, "image") == 0) {
+        // 图片处理
         cmdImage(argc, argv);
     } else {
         printf("unknown cmd: %s\n", cmd);

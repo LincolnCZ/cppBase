@@ -25,6 +25,6 @@ add_subdirectory(imageproc)
 
 # example
 if(HAS_EXAMPLE)
-    add_executable(example example.cpp)
+    add_executable(example test/example.cpp)
     target_link_libraries(example audioproc videoproc imageproc avutil)
 endif()
