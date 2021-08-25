@@ -12,7 +12,7 @@
 
 UTILITY_NAMESPACE_BEGIN
 
-// 数字转换为字符串
+/** --------------- 数字转换为字符串 --------------- */
 extern char* u32toa(uint32_t value, char* buffer);
 
 inline char* i32toa(int32_t value, char* buffer) {
@@ -97,7 +97,7 @@ inline std::string to_string(int64_t n){
     return std::string(buf);
 }
 
-// 字符串转换为数字
+/** --------------- 字符串转换为数字 --------------- */
 inline long stol(const char *str, bool *succ = NULL){
     char *end = NULL;
     long ret = strtol(str, &end, 0);
@@ -122,7 +122,7 @@ inline unsigned long stoul(const std::string &str, bool *succ = NULL){
     return stoul(str.c_str(), succ);
 }
 
-// ip地址和字符串转换
+/** --------------- ip地址和字符串转换 --------------- */
 inline std::string addr_ntoa(uint32_t ip){
     struct in_addr addr;
     memcpy(&addr, &ip, 4);
@@ -135,6 +135,7 @@ inline const char *addr_ntoa_cstr(uint32_t ip){
     return inet_ntoa(addr);
 }
 
+/** --------------- 字符串常用的其他操作 --------------- */
 extern char* dumpHex(const void* bin, char* buffer, unsigned int len);
 extern std::string dumpHexString(const void *bin, size_t len);
 

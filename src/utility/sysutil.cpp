@@ -68,4 +68,22 @@ bool readFile(const std::string &path, std::string &data) {
     return true;
 }
 
+uint32_t utility::get_ip(const char *hostname) {
+    struct addrinfo hints;
+    struct addrinfo *result = NULL;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = 0;
+    hints.ai_protocol = 0;
+    int ret = getaddrinfo(hostname, NULL, &hints, &result);
+    if (ret != 0) {
+        return 0;
+    }
+    uint32_t ip = ((sockaddr_in *) result->ai_addr)->sin_addr.s_addr;
+    freeaddrinfo(result);
+
+    return ip;
+}
+
 UTILITY_NAMESPACE_END

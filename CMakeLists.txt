@@ -51,3 +51,5 @@ add_subdirectory(example)
 
 # design pattern
 #add_subdirectory(project/design_pattern)
+
+add_subdirectory(project/socket)

@@ -101,7 +101,30 @@ void test_map() {
         std::cout << i.first << " " << i.second << std::endl;
 }
 
+void test() {
+    std::map<int, std::string> m = {{1,  "one"},
+                                    {2,  "two"},
+                                    {3,  "three"},
+                                    {4,  "four"},
+                                    {5,  "five"},
+                                    {6,  "6"},
+                                    {7,  "7"},
+                                    {8,  "8"},
+                                    {9,  "9"},
+                                    {10, "10"}};
+    for (std::map<int, std::string>::iterator it = m.begin(); it != m.end();) {
+        if (it->first % 2 == 1) {
+            m.erase(it++);
+            continue;
+        }
+        ++it;
+    }
+    for (const auto &i :m)
+        std::cout << i.first << " " << i.second << std::endl;
+}
+
 int main() {
-    test_vector();
-    test_map();
+//    test_vector();
+//    test_map();
+    test();
 }
