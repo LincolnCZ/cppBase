@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
-#include "string"
 
 /**怎样写出一个可以处理像 printf 一样能够处理可变长参数的函数呢。
 看printf的定义:
@@ -38,9 +37,8 @@ void read_num(int num, ...) {
 }
 
 int main() {
-    std::string match("*$v");
-    write_log("SCAN %d MATCH %s COUNT %d\n", 4, match.c_str(), 100);
-//    read_num(3, 111, 222, 333);
+    write_log("%s\n", "hello world!");
+    read_num(3, 111, 222, 333);
     return 0;
 }
 // 输出结果：

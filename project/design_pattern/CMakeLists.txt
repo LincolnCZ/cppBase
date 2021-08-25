@@ -11,3 +11,4 @@ add_subdirectory("structural_patterns/02bridge")
 add_subdirectory("structural_patterns/03decorator")
 
 # 行为型
+add_subdirectory("behavioral_patterns/01observer")
