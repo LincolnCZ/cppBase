@@ -5,8 +5,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-#set(CMAKE_CXX_FLAGS "-g1 -O2 -DNDEBUG -Wall -std=c++11")
-set(CMAKE_CXX_FLAGS "-g1 -O0 -DNDEBUG -Wall -gstabs+ -std=c++11") # debug
+set(CMAKE_CXX_FLAGS "-g1 -O2 -DNDEBUG -Wall -std=c++11")
+#set(CMAKE_CXX_FLAGS "-g1 -O0 -DNDEBUG -Wall -gstabs+ -std=c++11") # debug
 
 if(CPPBASE_TEST)
     add_definitions(-DLOGGER_USING_PRINT)
@@ -41,15 +41,19 @@ endif ()
 #-------------------------------------end--------------------------------------
 
 # example
-add_subdirectory(example)
+#add_subdirectory(example)
 
 # center_config
 #add_subdirectory(project/center_config)
 
 # mediaproc_lib
-#add_subdirectory(project/mediaproc_lib)
+add_subdirectory(project/mediaproc_lib)
 
 # design pattern
 #add_subdirectory(project/design_pattern)
 
-add_subdirectory(project/socket)
+# socket test
+#add_subdirectory(project/socket)
+
+# ffmpeg_tutorial
+add_subdirectory(project/ffmpeg_tutorial)

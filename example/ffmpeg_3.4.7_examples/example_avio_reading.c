@@ -87,19 +87,23 @@ int main(int argc, char *argv[]) {
         goto end;
     }
 
+    // 1. 分配缓冲区
     avio_ctx_buffer = av_malloc(avio_ctx_buffer_size);
     if (!avio_ctx_buffer) {
         ret = AVERROR(ENOMEM);
         goto end;
     }
+    // 2. 分配AVIOContext，第三个参数write_flag为0
     avio_ctx = avio_alloc_context(avio_ctx_buffer, avio_ctx_buffer_size,
                                   0, &bd, &read_packet, NULL, NULL);
     if (!avio_ctx) {
         ret = AVERROR(ENOMEM);
         goto end;
     }
+    // 3. 分配AVFormatContext，并指定AVFormatContext.pb字段。必须在调用avformat_open_input()之前完成
     fmt_ctx->pb = avio_ctx;
 
+    // 4. 打开输入(读取封装格式文件头)
     ret = avformat_open_input(&fmt_ctx, NULL, NULL, NULL);
     if (ret < 0) {
         fprintf(stderr, "Could not open input\n");

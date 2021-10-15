@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <unistd.h>
 #include "audioproc/AudioProcessor.h"
-#include "videoproc/DecodeProc.h"
+#include "videoproc/Processor.h"
 #include "imageproc/imageproc.h"
 #include "core/logger.h"
 #include "core/utils.h"
@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
         return 0;
     }
     const char *cmd = argv[1];
-        // 音频处理
+    //----- 音频处理 -----------------
     if (strcmp(cmd, "decode") == 0) {
         cmdDecode(argc, argv);
     } else if (strcmp(cmd, "split") == 0) {
@@ -219,11 +219,13 @@ int main(int argc, char **argv) {
         cmdConvert(argc, argv);
     } else if (strcmp(cmd, "error") == 0) {
         cmdError(argc, argv);
-    } else if (strcmp(cmd, "screenshot") == 0) {
-        // 视频处理
+    }
+    //----- 视频处理 -----------------
+    else if (strcmp(cmd, "screenshot") == 0) {
         cmdScreenShot(argc, argv);
-    } else if (strcmp(cmd, "image") == 0) {
-        // 图片处理
+    }
+    //----- 图片处理 -----------------
+    else if (strcmp(cmd, "image") == 0) {
         cmdImage(argc, argv);
     } else {
         printf("unknown cmd: %s\n", cmd);

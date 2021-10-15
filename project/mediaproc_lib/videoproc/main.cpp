@@ -8,7 +8,7 @@
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
 
-#include "DecodeProc.h"
+#include "Processor.h"
 #include "core/logger.h"
 
 using namespace ::apache::thrift;

@@ -76,6 +76,10 @@ void AVIOMemory::reset(const char *input, int size) {
     pos = 0;
 }
 
+// @opaque  : 是由用户提供的参数，指向用户数据
+// @buf     : 作为FFmpeg的输入，此处由用户准备好buf中的数据
+// @buf_size: buf的大小
+// @return  : 本次IO数据量
 int AVIOMemory::readString(void *opaque, uint8_t *buf, int size) {
     AVIOMemory *self = reinterpret_cast<AVIOMemory *>(opaque);
     int left = self->buffer.size() - self->pos;
@@ -87,6 +91,10 @@ int AVIOMemory::readString(void *opaque, uint8_t *buf, int size) {
     return bytesRead;
 }
 
+// @opaque  : 是由用户提供的参数，指向用户数据
+// @buf     : 作为FFmpeg的输出，此处FFmpeg已准备好buf中的数据
+// @buf_size: buf的大小
+// @return  : 本次IO数据量
 int AVIOMemory::writeString(void *opaque, uint8_t *buf, int size) {
     AVIOMemory *self = reinterpret_cast<AVIOMemory *>(opaque);
     int left = self->buffer.size() - self->pos;

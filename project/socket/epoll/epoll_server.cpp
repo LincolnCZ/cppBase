@@ -25,7 +25,8 @@ int SetNonblocking(int fd) {
     return old_option;
 }
 
-/* Register EPOLLIN on file descriptor FD into the epoll kernel event table indicated by epoll_fd, and the parameter enable_et specifies whether et mode is enabled for FD */
+/* Register EPOLLIN on file descriptor FD into the epoll kernel event table indicated by epoll_fd, and the parameter
+ * enable_et specifies whether et mode is enabled for FD */
 void AddFd(int epoll_fd, int fd, bool enable_et) {
     struct epoll_event event;
     event.data.fd = fd;
@@ -54,7 +55,8 @@ void lt_process(struct epoll_event *events, int number, int epoll_fd, int listen
             AddFd(epoll_fd, connfd, false);  //Register new customer connection fd to epoll event table, using lt mode
         } else if (events[i].events & EPOLLIN) //Readable with client data
         {
-            // This code is triggered as long as the data in the buffer has not been read.This is what LT mode is all about: repeating notifications until processing is complete
+            // This code is triggered as long as the data in the buffer has not been read.This is what LT mode is all
+            // about: repeating notifications until processing is complete
             printf("lt mode: event trigger once!\n");
             memset(buf, 0, BUFFER_SIZE);
             int ret = recv(sockfd, buf, BUFFER_SIZE - 1, 0);
@@ -83,14 +85,16 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
             int connfd = accept(listen_fd, (struct sockaddr *) &client_address, &client_addrlength);
             AddFd(epoll_fd, connfd, true);  //Use et mode
         } else if (events[i].events & EPOLLIN) {
-            /* This code will not be triggered repeatedly, so we cycle through the data to make sure that all the data in the socket read cache is read out.This is how we eliminate the potential dangers of the ET model */
+            /* This code will not be triggered repeatedly, so we cycle through the data to make sure that all the data
+             * in the socket read cache is read out.This is how we eliminate the potential dangers of the ET model */
 
             printf("et mode: event trigger once!\n");
             while (1) {
                 memset(buf, 0, BUFFER_SIZE);
                 int ret = recv(sockfd, buf, BUFFER_SIZE - 1, 0);
                 if (ret < 0) {
-                    /* For non-congested IO, the following condition is true to indicate that the data has been read completely, after which epoll can trigger the EPOLLIN event on sockfd again to drive the next read operation */
+                    /* For non-congested IO, the following condition is true to indicate that the data has been read
+                     * completely, after which epoll can trigger the EPOLLIN event on sockfd again to drive the next read operation */
 
                     if (errno == EAGAIN || errno == EWOULDBLOCK) {
                         printf("read later!\n");
@@ -176,3 +180,13 @@ int main(int argc, char *argv[]) {
     return 0;
 
 }
+class  test{
+private:
+    struct GroupInfo {
+        bool resSuccess;
+        bool exceedTime;
+        uint64_t joinTime;
+
+        GroupInfo() :resSuccess(false), exceedTime(false), joinTime(0) {};
+    };
+};

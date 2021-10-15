@@ -1,5 +1,5 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-set(VIDEO_PROC_SRC VideoDecoder.cpp ImageEncoder.cpp DecodeProc.cpp)
+set(VIDEO_PROC_SRC VideoDecoder.cpp ImageEncoder.cpp Processor.cpp)
 
 # 生成静态库
 add_library(videoproc STATIC ${VIDEO_PROC_SRC} ${VIDEO_THRIFT_SRC} $<TARGET_OBJECTS:core>)

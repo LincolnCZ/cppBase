@@ -1,0 +1,5 @@
+link_directories(/usr/local/Cellar/ffmpeg/4.4_2/lib)
+link_directories(/usr/local/Cellar/sdl2/2.0.16/lib)
+add_executable(tutorial02_d simplest_ffmpeg_player.c)
+target_include_directories(tutorial02_d PUBLIC /usr/local/Cellar/ffmpeg/4.4_2/include /usr/local/Cellar/sdl2/2.0.16/include)
+target_link_libraries(tutorial02_d avformat avcodec swscale avutil m z SDL2 SDL2_test SDL2main)
