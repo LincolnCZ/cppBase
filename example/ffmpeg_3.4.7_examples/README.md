@@ -33,5 +33,7 @@ PKG_CONFIG_PATH=pc-uninstalled make.
 * demuxing_decoding ：Demuxing and decoding example. 音视频文件解封装。
 * remuxing ：音视频文件转封装。视频截取。
 * avio_reading ：avio内存数据操作。
+* avio_reading ：avio内存数据操作。
+
 
 https://www.bilibili.com/read/cv12654758

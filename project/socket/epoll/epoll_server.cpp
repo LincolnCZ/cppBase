@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -8,6 +9,8 @@
 #include <cstdlib>
 #include <sys/epoll.h>
 #include <cerrno>
+#include <pthread.h>
+#include <stdbool.h>
 
 
 // https://programmer.ink/think/epoll-for-linux-programming.html
@@ -180,13 +183,14 @@ int main(int argc, char *argv[]) {
     return 0;
 
 }
-class  test{
+
+class test {
 private:
     struct GroupInfo {
         bool resSuccess;
         bool exceedTime;
         uint64_t joinTime;
 
-        GroupInfo() :resSuccess(false), exceedTime(false), joinTime(0) {};
+        GroupInfo() : resSuccess(false), exceedTime(false), joinTime(0) {};
     };
 };
