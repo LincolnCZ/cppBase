@@ -1,4 +1,4 @@
-tutorial02: tutorial02.c
+tutorial02: tutorial02.cpp
 	gcc -o tutorial02 tutorial02.c -lavutil -lavformat -lavcodec -lswscale -lz -lm `sdl-config --cflags --libs`
 
 clean:

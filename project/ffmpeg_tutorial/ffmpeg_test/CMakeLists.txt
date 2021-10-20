@@ -1,0 +1,1 @@
+add_subdirectory(swscale_yuv420p_to_rgb24)

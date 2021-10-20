@@ -1,5 +1,5 @@
 link_directories(${FFMPEG_DIR}/lib)
 link_directories(${SDL_DIR}/lib)
-add_executable(tutorial02_d tutorial02.c)
+add_executable(tutorial02_d tutorial02.cpp)
 target_include_directories(tutorial02_d PUBLIC ${SDL_DIR}/include/SDL2 ${FFMPEG_DIR}/include)
 target_link_libraries(tutorial02_d avformat avcodec swscale avutil m z SDL2)
