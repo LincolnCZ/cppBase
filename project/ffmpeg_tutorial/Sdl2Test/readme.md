@@ -22,7 +22,7 @@ ffmpeg -pix_fmt yuv420p -s 1000x667 -i tiger.jpeg tiger_yuv420p_1000x667.yuv
 ## 提取pcm
 
 ```bash
-ffprobe My_Heart_Will_Go_on.mp3
+$ ffprobe My_Heart_Will_Go_on.mp3
 ffprobe version 4.4 Copyright (c) 2007-2021 the FFmpeg developers
   built with Apple clang version 12.0.5 (clang-1205.0.22.9)
   configuration: --prefix=/usr/local/Cellar/ffmpeg/4.4_2 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gnutls --enable-gpl --enable-libaom --enable-libbluray --enable-libdav1d --enable-libmp3lame --enable-libopus --enable-librav1e --enable-librubberband --enable-libsnappy --enable-libsrt --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-lzma --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libspeex --enable-libsoxr --enable-libzmq --enable-libzimg --disable-libjack --disable-indev=jack --enable-avresample --enable-videotoolbox

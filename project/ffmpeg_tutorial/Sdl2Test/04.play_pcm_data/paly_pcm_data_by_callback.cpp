@@ -67,6 +67,7 @@ int main(int argc, char *argv[]) {
     }
 
     FILE *fp = fopen("/Users/linchengzhong/Desktop/NocturneNo2inEflat_44.1k_s16le.pcm", "rb+");
+//    FILE *fp = fopen("/Users/linchengzhong/Desktop/xjp.pcm", "rb+");
     if (fp == NULL) {
         printf("cannot open this file\n");
         return -1;

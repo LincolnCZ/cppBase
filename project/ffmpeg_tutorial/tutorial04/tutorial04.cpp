@@ -1,29 +1,6 @@
 // tutorial04.c
 // A pedagogical video player that will stream through every video frame as fast as it can,
 // and play audio (out of sync).
-//
-// This tutorial was written by Stephen Dranger (dranger@gmail.com).
-//
-// Code based on FFplay, Copyright (c) 2003 Fabrice Bellard, 
-// and a tutorial by Martin Bohme (boehme@inb.uni-luebeckREMOVETHIS.de)
-// Tested on Gentoo, CVS version 5/01/07 compiled with GCC 4.1.1
-//
-//
-// Updates tested on:
-// Mac OS X 10.11.6
-// Apple LLVM version 8.0.0 (clang-800.0.38)
-//
-// Use 
-//
-// $ gcc -o tutorial04 tutorial04.c -lavutil -lavformat -lavcodec -lswscale -lz -lm `sdl-config --cflags --libs`
-//
-// to build (assuming libavutil/libavformat/libavcodec/libswscale are correctly installed your system).
-//
-// Run using
-//
-// $ tutorial04 myvideofile.mpg
-//
-// to play the video stream on your screen.
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -32,6 +9,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 #include <libavutil/avstring.h>
 #include <libavutil/imgutils.h>
+#include <libswresample/swresample.h>
 
 #include <SDL.h>
 #include <SDL_thread.h>
@@ -79,11 +57,16 @@ typedef struct VideoPicture {
 typedef struct VideoState {
     AVFormatContext *pFormatCtx;
     int videoStream, audioStream;
+
+    // ----音频处理相关------------------
     AVStream *audio_st;
     PacketQueue audioq;
     uint8_t audio_buf[(MAX_AUDIO_FRAME_SIZE * 3) / 2];
     unsigned int audio_buf_size;
     unsigned int audio_buf_index;
+    struct SwrContext *audio_convert_ctx;
+    int audio_out_buffer_size;
+
     AVFrame audio_frame;
     AVPacket audio_pkt;
     uint8_t *audio_pkt_data;
@@ -91,6 +74,7 @@ typedef struct VideoState {
     AVStream *video_st;
     PacketQueue videoq;
 
+    // ----视频处理相关------------------
     // 视频数据缓冲区 pictq 来存储解码后的视频帧
     VideoPicture pictq[VIDEO_PICTURE_QUEUE_SIZE];
     int pictq_size, pictq_rindex, pictq_windex; // 读写索引
@@ -183,7 +167,7 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block) {
     return ret;
 }
 
-int audio_decode_frame(VideoState *is) {
+int audio_decode_frame(VideoState *is, uint8_t *audio_buf) {
     int len1, data_size = 0;
     AVPacket *pkt = &is->audio_pkt;
 
@@ -197,18 +181,14 @@ int audio_decode_frame(VideoState *is) {
                 break;
             }
             if (got_frame) {
-                data_size = av_samples_get_buffer_size(NULL, is->audio_st->codec->channels, is->audio_frame.nb_samples,
-                                                       is->audio_st->codec->sample_fmt, 1);
-                memcpy(is->audio_buf, is->audio_frame.data[0], data_size);
+                swr_convert(is->audio_convert_ctx, &audio_buf, MAX_AUDIO_FRAME_SIZE,
+                            (const uint8_t **) is->audio_frame.data, is->audio_frame.nb_samples);
             }
             is->audio_pkt_data += len1;
             is->audio_pkt_size -= len1;
-            if (data_size <= 0) {
-                // No data yet, get more frames.
-                continue;
-            }
+
             // We have data, return it and come back for more later.
-            return data_size;
+            return is->audio_out_buffer_size;
         }
         if (pkt->data) {
             av_packet_unref(pkt);
@@ -230,10 +210,12 @@ void audio_callback(void *userdata, Uint8 *stream, int len) {
     VideoState *is = (VideoState *) userdata;
     int len1, audio_size;
 
+    SDL_memset(stream, 0, len);
+
     while (len > 0) {
         if (is->audio_buf_index >= is->audio_buf_size) {
             // We have already sent all our data; get more.
-            audio_size = audio_decode_frame(is);
+            audio_size = audio_decode_frame(is, is->audio_buf);
             if (audio_size < 0) {
                 // If error, output silence.
                 is->audio_buf_size = 1024;
@@ -247,7 +229,8 @@ void audio_callback(void *userdata, Uint8 *stream, int len) {
         if (len1 > len) {
             len1 = len;
         }
-        memcpy(stream, (uint8_t *) is->audio_buf + is->audio_buf_index, len1);
+
+        SDL_MixAudio(stream, (uint8_t *) is->audio_buf + is->audio_buf_index, len1, SDL_MIX_MAXVOLUME);
         len -= len1;
         stream += len1;
         is->audio_buf_index += len1;
@@ -369,7 +352,6 @@ void alloc_picture(void *userdata) {
     av_image_fill_arrays(vp->pFrameYUV->data, vp->pFrameYUV->linesize, out_buffer,
                          AV_PIX_FMT_YUV420P, is->video_st->codec->width, is->video_st->codec->height, 1);
 
-//    vp->bmp = SDL_CreateYUVOverlay(is->video_st->codec->width, is->video_st->codec->height, SDL_YV12_OVERLAY, screen);
     SDL_UnlockMutex(screen_mutex);
     vp->width = is->video_st->codec->width;
     vp->height = is->video_st->codec->height;
@@ -378,7 +360,6 @@ void alloc_picture(void *userdata) {
     vp->allocated = 1;
     SDL_CondSignal(is->pictq_cond);
     SDL_UnlockMutex(is->pictq_mutex);
-
 }
 
 int queue_picture(VideoState *is, AVFrame *pFrame) {
@@ -442,10 +423,8 @@ int video_thread(void *arg) {
     AVPacket pkt1, *packet = &pkt1;
     int frameFinished;
     AVFrame *pFrame;
-//    AVFrame *pFrameYUV;
 
     pFrame = av_frame_alloc();
-
     for (;;) {
         if (packet_queue_get(&is->videoq, packet, 1) < 0) {
             // Means we quit getting packets.
@@ -462,8 +441,8 @@ int video_thread(void *arg) {
         }
         av_packet_unref(packet);
     }
+
     av_free(pFrame);
-//    av_free(pFrameYUV);
     return 0;
 }
 
@@ -483,16 +462,41 @@ int stream_component_open(VideoState *is, int stream_index) {
     codecCtx = pFormatCtx->streams[stream_index]->codec;
 
     if (codecCtx->codec_type == AVMEDIA_TYPE_AUDIO) {
+
+        //---------------------------
+        //Out Audio Param
+        uint64_t out_channel_layout = AV_CH_LAYOUT_STEREO;
+        //nb_samples: AAC-1024 MP3-1152
+        int out_nb_samples = codecCtx->frame_size;
+        AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;
+        int out_sample_rate = codecCtx->sample_rate;
+        int out_channels = av_get_channel_layout_nb_channels(out_channel_layout);
+
+        //Out Buffer Size
+        is->audio_out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, out_nb_samples, out_sample_fmt, 1);
+        cout << "audio_out_buffer_size :" << is->audio_out_buffer_size << endl;
+
+//    //FIX:Some Codec's Context Information is missing
+        int64_t in_channel_layout = av_get_default_channel_layout(codecCtx->channels);
+
+        //Swr
+        is->audio_convert_ctx = swr_alloc();
+        is->audio_convert_ctx = swr_alloc_set_opts(is->audio_convert_ctx, out_channel_layout, out_sample_fmt,
+                                                   out_sample_rate, in_channel_layout, codecCtx->sample_fmt,
+                                                   codecCtx->sample_rate, 0, NULL);
+        swr_init(is->audio_convert_ctx);
+        //------------------------------
+
         // Set audio settings from codec info.
-        wanted_spec.freq = codecCtx->sample_rate;
+        wanted_spec.freq = out_sample_rate;
         wanted_spec.format = AUDIO_S16SYS;
-        wanted_spec.channels = codecCtx->channels;
+        wanted_spec.channels = out_channels;
         wanted_spec.silence = 0;
-        wanted_spec.samples = SDL_AUDIO_BUFFER_SIZE;
+        wanted_spec.samples = out_nb_samples;
         wanted_spec.callback = audio_callback;
         wanted_spec.userdata = is;
 
-        if (SDL_OpenAudio(&wanted_spec, &spec) < 0) {
+        if (SDL_OpenAudio(&wanted_spec, NULL) < 0) {
             fprintf(stderr, "SDL_OpenAudio: %s\n", SDL_GetError());
             return -1;
         }
@@ -709,5 +713,4 @@ int main(int argc, char *argv[]) {
         }
     }
     return 0;
-
 }
