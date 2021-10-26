@@ -45,9 +45,8 @@ typedef struct PacketQueue {
     SDL_cond *cond;
 } PacketQueue;
 
-
 typedef struct VideoPicture {
-    SDL_Texture *texture; // todo,sdl相关的需要释放资源
+    SDL_Texture *texture;
     int width, height; // Source height & width.
     int allocated;
 
@@ -56,14 +55,17 @@ typedef struct VideoPicture {
 
 typedef struct VideoState {
     AVFormatContext *pFormatCtx;
-    int videoStream, audioStream;
+    int videoStreamIndex, audioStreamIndex;
+    AVIOContext *io_context;
 
     // ----音频处理相关------------------
     AVStream *audio_st;
     PacketQueue audioq;
+    // 音频在SDL向播放的缓冲相关
     uint8_t audio_buf[(MAX_AUDIO_FRAME_SIZE * 3) / 2];
     unsigned int audio_buf_size;
     unsigned int audio_buf_index;
+    // 音频转换相关
     struct SwrContext *audio_convert_ctx;
     int audio_out_buffer_size;
 
@@ -71,28 +73,27 @@ typedef struct VideoState {
     AVPacket audio_pkt;
     uint8_t *audio_pkt_data;
     int audio_pkt_size;
-    AVStream *video_st;
-    PacketQueue videoq;
 
     // ----视频处理相关------------------
+    AVStream *video_st;
+    PacketQueue videoq;
     // 视频数据缓冲区 pictq 来存储解码后的视频帧
     VideoPicture pictq[VIDEO_PICTURE_QUEUE_SIZE];
     int pictq_size, pictq_rindex, pictq_windex; // 读写索引
     SDL_mutex *pictq_mutex;
     SDL_cond *pictq_cond;
+    // 视频转换相关
+    struct SwsContext *sws_ctx;
 
+    // ----其他------------------
     SDL_Thread *parse_tid;
     SDL_Thread *video_tid;
-
     char filename[1024];
     int quit;
-
-    AVIOContext *io_context;
-    struct SwsContext *sws_ctx;
 } VideoState;
 
 //SDL_Surface *screen;
-SDL_mutex *screen_mutex;
+SDL_mutex *g_screen_mutex;
 
 // Since we only have one decoding thread, the Big Struct can be global in case we need it.
 VideoState *global_video_state;
@@ -285,14 +286,14 @@ void video_display(VideoState *is) {
         rect.w = w;
         rect.h = h;
 
-        SDL_LockMutex(screen_mutex);
+        SDL_LockMutex(g_screen_mutex);
 
         SDL_UpdateTexture(vp->texture, NULL, vp->pFrameYUV->data[0], vp->pFrameYUV->linesize[0]);
         SDL_RenderClear(g_sdl_renderer);
         SDL_RenderCopy(g_sdl_renderer, vp->texture, NULL, NULL);
         SDL_RenderPresent(g_sdl_renderer);
 
-        SDL_UnlockMutex(screen_mutex);
+        SDL_UnlockMutex(g_screen_mutex);
     }
 }
 
@@ -338,11 +339,10 @@ void alloc_picture(void *userdata) {
     vp = &is->pictq[is->pictq_windex];
     if (vp->texture) {
         // We already have one make another, bigger/smaller.
-//        SDL_FreeYUVOverlay(vp->bmp);
         SDL_DestroyTexture(vp->texture);
     }
     // Allocate a place to put our YUV image on that screen.
-    SDL_LockMutex(screen_mutex);
+    SDL_LockMutex(g_screen_mutex);
     vp->texture = SDL_CreateTexture(g_sdl_renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING,
                                     is->video_st->codec->width, is->video_st->codec->height);
 
@@ -352,7 +352,7 @@ void alloc_picture(void *userdata) {
     av_image_fill_arrays(vp->pFrameYUV->data, vp->pFrameYUV->linesize, out_buffer,
                          AV_PIX_FMT_YUV420P, is->video_st->codec->width, is->video_st->codec->height, 1);
 
-    SDL_UnlockMutex(screen_mutex);
+    SDL_UnlockMutex(g_screen_mutex);
     vp->width = is->video_st->codec->width;
     vp->height = is->video_st->codec->height;
 
@@ -509,7 +509,7 @@ int stream_component_open(VideoState *is, int stream_index) {
 
     switch (codecCtx->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
-            is->audioStream = stream_index;
+            is->audioStreamIndex = stream_index;
             is->audio_st = pFormatCtx->streams[stream_index];
             is->audio_buf_size = 0;
             is->audio_buf_index = 0;
@@ -518,7 +518,7 @@ int stream_component_open(VideoState *is, int stream_index) {
             SDL_PauseAudio(0);
             break;
         case AVMEDIA_TYPE_VIDEO:
-            is->videoStream = stream_index;
+            is->videoStreamIndex = stream_index;
             is->video_st = pFormatCtx->streams[stream_index];
 
             packet_queue_init(&is->videoq);
@@ -551,8 +551,8 @@ int decode_thread(void *arg) {
     AVDictionary *io_dict = NULL;
     AVIOInterruptCB callback;
 
-    is->videoStream = -1;
-    is->audioStream = -1;
+    is->videoStreamIndex = -1;
+    is->audioStreamIndex = -1;
 
     global_video_state = is;
     // will interrupt blocking functions if we quit!.
@@ -594,7 +594,7 @@ int decode_thread(void *arg) {
         stream_component_open(is, video_index);
     }
 
-    if (is->videoStream < 0 || is->audioStream < 0) {
+    if (is->videoStreamIndex < 0 || is->audioStreamIndex < 0) {
         fprintf(stderr, "%s: could not open codecs\n", is->filename);
         goto fail;
     }
@@ -618,9 +618,9 @@ int decode_thread(void *arg) {
             }
         }
         // Is this a packet from the video stream?
-        if (packet->stream_index == is->videoStream) {
+        if (packet->stream_index == is->videoStreamIndex) {
             packet_queue_put(&is->videoq, packet);
-        } else if (packet->stream_index == is->audioStream) {
+        } else if (packet->stream_index == is->audioStreamIndex) {
             packet_queue_put(&is->audioq, packet);
         } else {
             av_packet_unref(packet);
@@ -642,7 +642,6 @@ int decode_thread(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
-
     SDL_Event event;
 
     VideoState *is;
@@ -675,7 +674,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    screen_mutex = SDL_CreateMutex();
+    g_screen_mutex = SDL_CreateMutex();
 
     av_strlcpy(is->filename, argv[1], sizeof(is->filename));
 
@@ -684,7 +683,7 @@ int main(int argc, char *argv[]) {
 
     schedule_refresh(is, 40);
 
-    is->parse_tid = SDL_CreateThread(decode_thread, "parse thread", is);
+    is->parse_tid = SDL_CreateThread(decode_thread, "decode thread", is);
     if (!is->parse_tid) {
         av_free(is);
         return -1;
@@ -696,7 +695,8 @@ int main(int argc, char *argv[]) {
             case FF_QUIT_EVENT:
             case SDL_QUIT:
                 is->quit = 1;
-                // If the video has finished playing, then both the picture and audio queues are waiting for more data.  Make them stop waiting and terminate normally..
+                // If the video has finished playing, then both the picture and audio queues are waiting for more data.
+                // Make them stop waiting and terminate normally..
                 SDL_CondSignal(is->audioq.cond);
                 SDL_CondSignal(is->videoq.cond);
                 SDL_Quit();

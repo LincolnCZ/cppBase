@@ -63,7 +63,7 @@ typedef struct VideoPicture {
 
 typedef struct VideoState {
     AVFormatContext *pFormatCtx;
-    int videoStream, audioStream;
+    int videoStreamIndex, audioStreamIndex;
 
     // ----音频处理相关------------------
     double audio_clock;
@@ -106,7 +106,7 @@ typedef struct VideoState {
 } VideoState;
 
 //SDL_Surface *screen;
-SDL_mutex *screen_mutex;
+SDL_mutex *g_screen_mutex;
 
 // Since we only have one decoding thread, the Big Struct can be global in case we need it.
 VideoState *global_video_state;
@@ -310,14 +310,14 @@ void video_display(VideoState *is) {
         rect.w = w;
         rect.h = h;
 
-        SDL_LockMutex(screen_mutex);
+        SDL_LockMutex(g_screen_mutex);
 
         SDL_UpdateTexture(vp->texture, NULL, vp->pFrameYUV->data[0], vp->pFrameYUV->linesize[0]);
         SDL_RenderClear(g_sdl_renderer);
         SDL_RenderCopy(g_sdl_renderer, vp->texture, NULL, NULL);
         SDL_RenderPresent(g_sdl_renderer);
 
-        SDL_UnlockMutex(screen_mutex);
+        SDL_UnlockMutex(g_screen_mutex);
     }
 }
 
@@ -408,7 +408,7 @@ void alloc_picture(void *userdata) {
         SDL_DestroyTexture(vp->texture);
     }
     // Allocate a place to put our YUV image on that screen.
-    SDL_LockMutex(screen_mutex);
+    SDL_LockMutex(g_screen_mutex);
     vp->texture = SDL_CreateTexture(g_sdl_renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING,
                                     is->video_st->codec->width, is->video_st->codec->height);
 
@@ -418,7 +418,7 @@ void alloc_picture(void *userdata) {
     av_image_fill_arrays(vp->pFrameYUV->data, vp->pFrameYUV->linesize, out_buffer,
                          AV_PIX_FMT_YUV420P, is->video_st->codec->width, is->video_st->codec->height, 1);
 
-    SDL_UnlockMutex(screen_mutex);
+    SDL_UnlockMutex(g_screen_mutex);
     vp->width = is->video_st->codec->width;
     vp->height = is->video_st->codec->height;
 
@@ -609,7 +609,7 @@ int stream_component_open(VideoState *is, int stream_index) {
 
     switch (codecCtx->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
-            is->audioStream = stream_index;
+            is->audioStreamIndex = stream_index;
             is->audio_st = pFormatCtx->streams[stream_index];
             is->audio_buf_size = 0;
             is->audio_buf_index = 0;
@@ -618,7 +618,7 @@ int stream_component_open(VideoState *is, int stream_index) {
             SDL_PauseAudio(0);
             break;
         case AVMEDIA_TYPE_VIDEO:
-            is->videoStream = stream_index;
+            is->videoStreamIndex = stream_index;
             is->video_st = pFormatCtx->streams[stream_index];
 
             is->frame_timer = (double) av_gettime() / 1000000.0;
@@ -654,8 +654,8 @@ int decode_thread(void *arg) {
     AVDictionary *io_dict = NULL;
     AVIOInterruptCB callback;
 
-    is->videoStream = -1;
-    is->audioStream = -1;
+    is->videoStreamIndex = -1;
+    is->audioStreamIndex = -1;
 
     global_video_state = is;
     // will interrupt blocking functions if we quit!.
@@ -697,7 +697,7 @@ int decode_thread(void *arg) {
         stream_component_open(is, video_index);
     }
 
-    if (is->videoStream < 0 || is->audioStream < 0) {
+    if (is->videoStreamIndex < 0 || is->audioStreamIndex < 0) {
         fprintf(stderr, "%s: could not open codecs\n", is->filename);
         goto fail;
     }
@@ -721,9 +721,9 @@ int decode_thread(void *arg) {
             }
         }
         // Is this a packet from the video stream?
-        if (packet->stream_index == is->videoStream) {
+        if (packet->stream_index == is->videoStreamIndex) {
             packet_queue_put(&is->videoq, packet);
-        } else if (packet->stream_index == is->audioStream) {
+        } else if (packet->stream_index == is->audioStreamIndex) {
             packet_queue_put(&is->audioq, packet);
         } else {
             av_packet_unref(packet);
@@ -778,7 +778,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    screen_mutex = SDL_CreateMutex();
+    g_screen_mutex = SDL_CreateMutex();
 
     av_strlcpy(is->filename, argv[1], sizeof(is->filename));
 

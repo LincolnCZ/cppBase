@@ -21,7 +21,7 @@ using namespace std;
 #define SDL_AUDIO_BUFFER_SIZE 1024
 #define MAX_AUDIO_FRAME_SIZE 192000
 
-struct SwrContext *g_au_convert_ctx;
+struct SwrContext *g_audio_convert_ctx;
 int g_audio_out_buffer_size;
 
 typedef struct PacketQueue {
@@ -53,7 +53,6 @@ int packet_queue_put(PacketQueue *q, AVPacket *pkt) {
     }
     pkt1->pkt = *pkt;
     pkt1->next = NULL;
-
 
     SDL_LockMutex(q->mutex);
 
@@ -127,7 +126,7 @@ int audio_decode_frame(AVCodecContext *aCodecCtx, uint8_t *audio_buf) {
             audio_pkt_data += len1;
             audio_pkt_size -= len1;
             if (got_frame) {
-                swr_convert(g_au_convert_ctx, &audio_buf, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
+                swr_convert(g_audio_convert_ctx, &audio_buf, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
                             frame->nb_samples);
             }
             return g_audio_out_buffer_size;
@@ -189,7 +188,6 @@ SDL_Texture *g_sdl_texture;
 SDL_Window *g_sdl_window;
 SDL_Event g_sdl_event;
 
-//int init_sdl() {
 int init_sdl(int width, int height, int out_sample_rate, int out_channels, int out_nb_samples,
              AVCodecContext *aCodecCtx) {
     cout << "init sdl, width:" << width << ",height:" << height << endl;
@@ -249,8 +247,8 @@ int free_sdl() {
 
 int main(int argc, char *argv[]) {
     AVFormatContext *pFormatCtx = NULL;
-    int i, videoStream, audioStream;
-    AVCodecContext *pCodecCtx = NULL;
+    int i, videoStreamIndex, audioStreamIndex;
+    AVCodecContext *vCodecCtx = NULL;
     AVCodec *pCodec = NULL;
     AVFrame *pFrame = NULL;
     AVFrame *pFrameYUV = NULL;
@@ -285,24 +283,49 @@ int main(int argc, char *argv[]) {
     av_dump_format(pFormatCtx, 0, argv[1], 0);
 
     // Find the first video stream.
-    videoStream = -1;
-    audioStream = -1;
+    videoStreamIndex = -1;
+    audioStreamIndex = -1;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO && videoStream < 0) {
-            videoStream = i;
+        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO && videoStreamIndex < 0) {
+            videoStreamIndex = i;
         }
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO && audioStream < 0) {
-            audioStream = i;
+        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO && audioStreamIndex < 0) {
+            audioStreamIndex = i;
         }
     }
-    if (videoStream == -1) {
+    if (videoStreamIndex == -1) {
         return -1; // Didn't find a video stream.
     }
-    if (audioStream == -1) {
+    if (audioStreamIndex == -1) {
         return -1;
     }
 
-    aCodecCtx = pFormatCtx->streams[audioStream]->codec;
+    // Get a pointer to the codec context for the video stream.
+    vCodecCtx = pFormatCtx->streams[videoStreamIndex]->codec;
+
+    // Find the decoder for the video stream.
+    pCodec = avcodec_find_decoder(vCodecCtx->codec_id);
+    if (pCodec == NULL) {
+        cout << "Unsupported codec!" << endl;
+        return -1; // Codec not found.
+    }
+    // Open codec.
+    if (avcodec_open2(vCodecCtx, pCodec, &videoOptionsDict) < 0)
+        return -1; // Could not open codec.
+
+    // Allocate video frame.
+    pFrame = av_frame_alloc();
+    pFrameYUV = av_frame_alloc();
+    unsigned char *out_buffer = (unsigned char *) av_malloc(
+            av_image_get_buffer_size(AV_PIX_FMT_YUV420P, vCodecCtx->width, vCodecCtx->height, 1));
+    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, out_buffer,
+                         AV_PIX_FMT_YUV420P, vCodecCtx->width, vCodecCtx->height, 1);
+
+    // audio_st = pFormatCtx->streams[index].
+    packet_queue_init(&audioq);
+
+    // audio codec
+    aCodecCtx = pFormatCtx->streams[audioStreamIndex]->codec;
     aCodec = avcodec_find_decoder(aCodecCtx->codec_id);
     if (!aCodec) {
         cout << "Unsupported codec!" << endl;
@@ -310,30 +333,6 @@ int main(int argc, char *argv[]) {
     }
 
     avcodec_open2(aCodecCtx, aCodec, &audioOptionsDict);
-
-    // audio_st = pFormatCtx->streams[index].
-    packet_queue_init(&audioq);
-
-    // Get a pointer to the codec context for the video stream.
-    pCodecCtx = pFormatCtx->streams[videoStream]->codec;
-
-    // Find the decoder for the video stream.
-    pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-    if (pCodec == NULL) {
-        cout << "Unsupported codec!" << endl;
-        return -1; // Codec not found.
-    }
-    // Open codec.
-    if (avcodec_open2(pCodecCtx, pCodec, &videoOptionsDict) < 0)
-        return -1; // Could not open codec.
-
-    // Allocate video frame.
-    pFrame = av_frame_alloc();
-    pFrameYUV = av_frame_alloc();
-    unsigned char *out_buffer = (unsigned char *) av_malloc(
-            av_image_get_buffer_size(AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1));
-    av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, out_buffer,
-                         AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
 
     //Out Audio Param
     uint64_t out_channel_layout = AV_CH_LAYOUT_STEREO;
@@ -351,22 +350,21 @@ int main(int argc, char *argv[]) {
     int64_t in_channel_layout = av_get_default_channel_layout(aCodecCtx->channels);
 
     //Swr
-    g_au_convert_ctx = swr_alloc();
-    g_au_convert_ctx = swr_alloc_set_opts(g_au_convert_ctx, out_channel_layout, out_sample_fmt, out_sample_rate,
-                                          in_channel_layout, aCodecCtx->sample_fmt, aCodecCtx->sample_rate, 0, NULL);
-    swr_init(g_au_convert_ctx);
+    g_audio_convert_ctx = swr_alloc();
+    g_audio_convert_ctx = swr_alloc_set_opts(g_audio_convert_ctx, out_channel_layout, out_sample_fmt, out_sample_rate,
+                                             in_channel_layout, aCodecCtx->sample_fmt, aCodecCtx->sample_rate, 0, NULL);
+    swr_init(g_audio_convert_ctx);
+
+    // Allocate a place to put our YUV image on that screen.
+    sws_ctx = sws_getContext(vCodecCtx->width, vCodecCtx->height, vCodecCtx->pix_fmt, vCodecCtx->width,
+                             vCodecCtx->height, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
 
     // init sdl
-    if (init_sdl(pCodecCtx->width, pCodecCtx->height, out_sample_rate, aCodecCtx->channels, out_nb_samples,
+    if (init_sdl(vCodecCtx->width, vCodecCtx->height, out_sample_rate, aCodecCtx->channels, out_nb_samples,
                  aCodecCtx)) {
         cout << "init sdl failed" << endl;
         exit(1);
     }
-
-    // Allocate a place to put our YUV image on that screen.
-    sws_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
-                             pCodecCtx->height, AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
-
 
     // Read frames and save first five frames to disk.
     i = 0;
@@ -383,14 +381,14 @@ int main(int argc, char *argv[]) {
         }
 
         // Is this a packet from the video stream?
-        if (packet.stream_index == videoStream) {
+        if (packet.stream_index == videoStreamIndex) {
             // Decode video frame.
-            avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+            avcodec_decode_video2(vCodecCtx, pFrame, &frameFinished, &packet);
 
             // Did we get a video frame?
             if (frameFinished) {
 
-                sws_scale(sws_ctx, (uint8_t const *const *) pFrame->data, pFrame->linesize, 0, pCodecCtx->height,
+                sws_scale(sws_ctx, (uint8_t const *const *) pFrame->data, pFrame->linesize, 0, vCodecCtx->height,
                           pFrameYUV->data, pFrameYUV->linesize);
 
                 //SDL---------------------------
@@ -402,7 +400,7 @@ int main(int argc, char *argv[]) {
 
                 av_packet_unref(&packet);
             }
-        } else if (packet.stream_index == audioStream) {
+        } else if (packet.stream_index == audioStreamIndex) {
             packet_queue_put(&audioq, &packet);
         } else {
             // Free the packet that was allocated by av_read_frame.
@@ -412,13 +410,13 @@ int main(int argc, char *argv[]) {
 
     getchar();
 
-    swr_free(&g_au_convert_ctx);
+    swr_free(&g_audio_convert_ctx);
 
     // Free the YUV frame.
     av_free(pFrame);
 
     // Close the codec.
-    avcodec_close(pCodecCtx);
+    avcodec_close(vCodecCtx);
 
     // Close the video file.
     avformat_close_input(&pFormatCtx);

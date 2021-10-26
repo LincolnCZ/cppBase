@@ -26,7 +26,7 @@ extern "C" {
 
 using namespace std;
 
-struct SwrContext *g_au_convert_ctx;
+struct SwrContext *g_audio_convert_ctx;
 int g_audio_out_buffer_size;
 SDL_Event g_sdl_event;
 
@@ -140,7 +140,7 @@ int audio_decode_frame(AVCodecContext *aCodecCtx, uint8_t *audio_buf) {
             audio_pkt_data += len1;
             audio_pkt_size -= len1;
             if (got_frame) {
-                swr_convert(g_au_convert_ctx, &audio_buf, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
+                swr_convert(g_audio_convert_ctx, &audio_buf, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
                             frame->nb_samples);
             }
             return g_audio_out_buffer_size;
@@ -310,10 +310,10 @@ int main(int argc, char *argv[]) {
     in_channel_layout = av_get_default_channel_layout(aCodecCtx->channels);
 
     //Swr
-    g_au_convert_ctx = swr_alloc();
-    g_au_convert_ctx = swr_alloc_set_opts(g_au_convert_ctx, out_channel_layout, out_sample_fmt, out_sample_rate,
-                                          in_channel_layout, aCodecCtx->sample_fmt, aCodecCtx->sample_rate, 0, NULL);
-    swr_init(g_au_convert_ctx);
+    g_audio_convert_ctx = swr_alloc();
+    g_audio_convert_ctx = swr_alloc_set_opts(g_audio_convert_ctx, out_channel_layout, out_sample_fmt, out_sample_rate,
+                                             in_channel_layout, aCodecCtx->sample_fmt, aCodecCtx->sample_rate, 0, NULL);
+    swr_init(g_audio_convert_ctx);
 
     // init sdl
     if (init_sdl(out_sample_rate, aCodecCtx->channels, out_nb_samples, aCodecCtx)) {
@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
 
     getchar();
 
-    swr_free(&g_au_convert_ctx);
+    swr_free(&g_audio_convert_ctx);
 
 #if USE_SDL
     SDL_CloseAudio();//Close SDL

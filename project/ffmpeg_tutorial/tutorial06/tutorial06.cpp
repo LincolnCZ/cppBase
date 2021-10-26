@@ -90,7 +90,7 @@ typedef struct VideoPicture {
 
 typedef struct VideoState {
     AVFormatContext *pFormatCtx;
-    int videoStream, audioStream;
+    int videoStreamIndex, audioStreamIndex;
 
     int av_sync_type;
     double external_clock; // External clock base.
@@ -727,7 +727,7 @@ int stream_component_open(VideoState *is, int stream_index) {
 
     switch (codecCtx->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
-            is->audioStream = stream_index;
+            is->audioStreamIndex = stream_index;
             is->audio_st = pFormatCtx->streams[stream_index];
             is->audio_buf_size = 0;
             is->audio_buf_index = 0;
@@ -743,7 +743,7 @@ int stream_component_open(VideoState *is, int stream_index) {
             SDL_PauseAudio(0);
             break;
         case AVMEDIA_TYPE_VIDEO:
-            is->videoStream = stream_index;
+            is->videoStreamIndex = stream_index;
             is->video_st = pFormatCtx->streams[stream_index];
 
             is->frame_timer = (double) av_gettime() / 1000000.0;
@@ -782,8 +782,8 @@ int decode_thread(void *arg) {
     int audio_index = -1;
     int i;
 
-    is->videoStream = -1;
-    is->audioStream = -1;
+    is->videoStreamIndex = -1;
+    is->audioStreamIndex = -1;
 
     global_video_state = is;
     // Will interrupt blocking functions if we quit!.
@@ -824,7 +824,7 @@ int decode_thread(void *arg) {
         stream_component_open(is, video_index);
     }
 
-    if (is->videoStream < 0 || is->audioStream < 0) {
+    if (is->videoStreamIndex < 0 || is->audioStreamIndex < 0) {
         fprintf(stderr, "%s: could not open codecs\n", is->filename);
         goto fail;
     }
@@ -849,9 +849,9 @@ int decode_thread(void *arg) {
             }
         }
         // Is this a packet from the video stream?.
-        if (packet->stream_index == is->videoStream) {
+        if (packet->stream_index == is->videoStreamIndex) {
             packet_queue_put(&is->videoq, packet);
-        } else if (packet->stream_index == is->audioStream) {
+        } else if (packet->stream_index == is->audioStreamIndex) {
             packet_queue_put(&is->audioq, packet);
         } else {
             av_packet_unref(packet);
