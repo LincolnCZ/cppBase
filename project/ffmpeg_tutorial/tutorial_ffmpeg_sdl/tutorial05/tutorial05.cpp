@@ -53,7 +53,7 @@ typedef struct PacketQueue {
 
 
 typedef struct VideoPicture {
-    SDL_Texture *texture; // todo,sdl相关的需要释放资源
+    SDL_Texture *texture;
     int width, height; // Source height & width.
     int allocated;
     double pts;
@@ -64,14 +64,16 @@ typedef struct VideoPicture {
 typedef struct VideoState {
     AVFormatContext *pFormatCtx;
     int videoStreamIndex, audioStreamIndex;
+    AVIOContext *io_context;
 
     // ----音频处理相关------------------
-    double audio_clock;
     AVStream *audio_st;
     PacketQueue audioq;
+    // 音频在SDL向播放的缓冲相关
     uint8_t audio_buf[(MAX_AUDIO_FRAME_SIZE * 3) / 2];
     unsigned int audio_buf_size;
     unsigned int audio_buf_index;
+    // 音频转换相关
     struct SwrContext *audio_convert_ctx;
     int audio_out_buffer_size;
 
@@ -80,13 +82,7 @@ typedef struct VideoState {
     uint8_t *audio_pkt_data;
     int audio_pkt_size;
 
-
     // ----视频处理相关------------------
-    int audio_hw_buf_size;
-    double frame_timer;
-    double frame_last_pts;
-    double frame_last_delay;
-    double video_clock; // pts of last decoded frame / predicted pts of next decoded frame.
     AVStream *video_st;
     PacketQueue videoq;
     // 视频数据缓冲区 pictq 来存储解码后的视频帧
@@ -94,15 +90,20 @@ typedef struct VideoState {
     int pictq_size, pictq_rindex, pictq_windex; // 读写索引
     SDL_mutex *pictq_mutex;
     SDL_cond *pictq_cond;
+    // 视频转换相关
+    struct SwsContext *sws_ctx;
+    // 音视频同步相关
+    double frame_timer;
+    double frame_last_pts;
+    double frame_last_delay;
+    double video_clock; // pts of last decoded frame / predicted pts of next decoded frame. 跟踪视频已经播过的时间
+    double audio_clock; // 跟踪音频现在播放的时间点
 
+    // ----其他------------------
     SDL_Thread *parse_tid;
     SDL_Thread *video_tid;
-
     char filename[1024];
     int quit;
-
-    AVIOContext *io_context;
-    struct SwsContext *sws_ctx;
 } VideoState;
 
 //SDL_Surface *screen;
@@ -182,7 +183,7 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block) {
 }
 
 int audio_decode_frame(VideoState *is, double *pts_ptr, uint8_t *audio_buf) {
-    int len1, data_size = 0, n;
+    int len1, n;
     AVPacket *pkt = &is->audio_pkt;
     double pts;
 
@@ -205,7 +206,7 @@ int audio_decode_frame(VideoState *is, double *pts_ptr, uint8_t *audio_buf) {
             pts = is->audio_clock;
             *pts_ptr = pts;
             n = 2 * is->audio_st->codec->channels;
-            is->audio_clock += (double) data_size / (double) (n * is->audio_st->codec->sample_rate);
+            is->audio_clock += (double) is->audio_out_buffer_size / (double) (n * is->audio_st->codec->sample_rate);
 
             // We have data, return it and come back for more later.
             return is->audio_out_buffer_size;

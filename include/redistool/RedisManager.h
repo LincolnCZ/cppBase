@@ -7,7 +7,6 @@
 #include <hiredis/async.h>
 #include "core/singleton.h"
 #include "core/RingBuffer.h"
-
 #include "Redis.h"
 #include "RedisRequest.h"
 

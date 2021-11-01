@@ -316,7 +316,7 @@ void *RedisManager::mainLoop(void *arg) {
     event_assign(&tmev, mgr->_evbase, -1, EV_PERSIST, RedisManager::timer, &tmev);
     evtimer_add(&tmev, &tv);
 
-    struct timeval tv_100ms = {0, 100000};
+    struct timeval tv_100ms = {0, 1000};
     struct event tmev_ms;
     event_assign(&tmev_ms, mgr->_evbase, -1, EV_PERSIST, RedisManager::timer_ms, &tmev_ms);
     evtimer_add(&tmev_ms, &tv_100ms);

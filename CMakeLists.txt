@@ -36,7 +36,7 @@ target_link_libraries(cppbase_redistool cppbase_core cppbase_utility hiredis eve
 # test
 if (CPPBASE_TEST)
 #    add_subdirectory(src/utility/test)
-#    add_subdirectory(src/redistool/test)
+    add_subdirectory(src/redistool/test)
 endif ()
 #-------------------------------------end--------------------------------------
 
@@ -56,4 +56,4 @@ add_subdirectory(project/mediaproc_lib)
 #add_subdirectory(project/socket)
 
 # ffmpeg_tutorial
-add_subdirectory(project/ffmpeg_tutorial)
+#add_subdirectory(project/ffmpeg_tutorial)
