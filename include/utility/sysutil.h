@@ -46,7 +46,7 @@ inline uint32_t hash_string(uint32_t hash, const char *str) {
     return (hash & 0x7FFFFFFF);
 }
 
-uint32_t hashChannelGroup(const std::string &channel, const std::set<uint32_t> &groups) {
+inline uint32_t hashChannelGroup(const std::string &channel, const std::set<uint32_t> &groups) {
     uint32_t maxHash = 0;
     uint32_t groupId = 0;
     for (std::set<uint32_t>::iterator it = groups.begin(); it != groups.end(); ++it) {

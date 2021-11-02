@@ -1,17 +1,23 @@
 #include <iostream>
+#include <vector>
+#include <sstream>
+#include <fstream>
 
-void parse(const std::string &s, const std::string &delim, std::string &liveId, std::string &version) {
-    size_t pos = 0;
-    size_t index = s.find(delim);
-    if (index != std::string::npos) {
-        liveId = s.substr(0, index);
-        pos = index + delim.size();
+bool readFile(const std::string &path, std::string &data) {
+    std::ifstream ifs(path, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!ifs.is_open())
+        return false;
+    std::ifstream::pos_type fileSize = ifs.tellg();
+    ifs.seekg(0, std::ios::beg);
 
-        version = s.substr(pos);
-    }
+    std::vector<char> bytes(fileSize);
+    ifs.read(bytes.data(), fileSize);
+    data.assign(bytes.data(), fileSize);
+    return true;
 }
 
 int main() {
-    int code = 2010 << 8 | 10;
-    std::cout << code << std::endl;
+    std::string  out;
+    std:: cout << readFile("/Users/linchengzhong/Desktop/query.lua", out) << std::endl;
+    std::cout << out << std::endl;
 }

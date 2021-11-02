@@ -68,7 +68,7 @@ bool readFile(const std::string &path, std::string &data) {
     return true;
 }
 
-uint32_t utility::get_ip(const char *hostname) {
+uint32_t get_ip(const char *hostname) {
     struct addrinfo hints;
     struct addrinfo *result = NULL;
     memset(&hints, 0, sizeof(struct addrinfo));
