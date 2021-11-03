@@ -1,7 +1,8 @@
 # Macro for add example target
 macro(add_example_target EXAMPLE_TARGET)
     add_executable("example_${EXAMPLE_TARGET}" "example_${EXAMPLE_TARGET}.cpp")
-    target_link_libraries("example_${EXAMPLE_TARGET}" pthread crypto)
+    target_link_libraries("example_${EXAMPLE_TARGET}" pthread)
+#    target_link_libraries("example_${EXAMPLE_TARGET}" pthread crypto)
 endmacro(add_example_target)
 
 add_example_target(hash)

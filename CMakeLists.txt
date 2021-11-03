@@ -8,9 +8,9 @@ set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-g1 -O2 -DNDEBUG -Wall -std=c++11")
 #set(CMAKE_CXX_FLAGS "-g1 -O0 -DNDEBUG -Wall -gstabs+ -std=c++11") # debug
 
-if(CPPBASE_TEST)
+if (CPPBASE_TEST)
     add_definitions(-DLOGGER_USING_PRINT)
-endif()
+endif ()
 
 #-----------------------------------基础模块start---------------------------------
 # cppbase_utility
@@ -56,4 +56,4 @@ add_subdirectory(example)
 #add_subdirectory(project/socket)
 
 # ffmpeg_tutorial
-#add_subdirectory(project/ffmpeg_tutorial)
+add_subdirectory(project/ffmpeg_tutorial)

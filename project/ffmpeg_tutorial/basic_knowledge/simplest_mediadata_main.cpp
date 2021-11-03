@@ -230,16 +230,18 @@ int main(int argc, char *argv[]) {
 
     ///-----------------------H264-------------------------------------------------
 //    simplest_h264_parser("sintel.h264");
-    simplest_h264_parser("/Users/linchengzhong/Work/myCode/myGitHub/cppBase/project/ffmpeg_tutorial/basic_knowledge/data/sintel.h264");
+//    simplest_h264_parser("/Users/linchengzhong/Work/myCode/myGitHub/cppBase/project/ffmpeg_tutorial/basic_knowledge/data/sintel.h264");
 
     ///-----------------------aac-------------------------------------------------
 //    simplest_aac_parser("nocturne.aac");
+//    simplest_aac_parser("/Users/linchengzhong/Work/myCode/myGitHub/cppBase/project/ffmpeg_tutorial/basic_knowledge/data/nocturne.aac");
 
     ///-----------------------flv-------------------------------------------------
 //    simplest_flv_parser("cuc_ieschool.flv");
+//    simplest_flv_parser("/Users/linchengzhong/Work/myCode/myGitHub/cppBase/project/ffmpeg_tutorial/basic_knowledge/data/cuc_ieschool.flv");
 
     ///-----------------------udp-------------------------------------------------
-//    simplest_udp_parser(8880);
+    simplest_udp_parser(8880);
 
     return 0;
 }

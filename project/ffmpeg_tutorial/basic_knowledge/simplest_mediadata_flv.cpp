@@ -5,7 +5,6 @@
 //Important!
 #pragma pack(1)
 
-
 #define TAG_TYPE_SCRIPT 18
 #define TAG_TYPE_AUDIO  8
 #define TAG_TYPE_VIDEO  9
@@ -13,6 +12,7 @@
 typedef unsigned char byte;
 typedef unsigned int uint;
 
+// 总共占用 9 字节
 typedef struct {
     byte Signature[3];
     byte Version;
@@ -20,13 +20,13 @@ typedef struct {
     uint DataOffset;
 } FLV_HEADER;
 
+// 总共占用 11 字节
 typedef struct {
     byte TagType;
     byte DataSize[3];
     byte Timestamp[3];
-    uint Reserved;
+    uint Reserved; // 4 字节
 } TAG_HEADER;
-
 
 //reverse_bytes - turn a BigEndian byte array into a LittleEndian integer
 uint reverse_bytes(byte *p, char c) {
@@ -41,7 +41,6 @@ uint reverse_bytes(byte *p, char c) {
  * Analysis FLV file
  * @param url    Location of input FLV file.
  */
-
 int simplest_flv_parser(char *url) {
 
     //whether output audio/video stream
@@ -79,8 +78,7 @@ int simplest_flv_parser(char *url) {
 
     //process each tag
     do {
-
-        previoustagsize = _getw(ifh);
+        previoustagsize = getw(ifh);
 
         fread((void *) &tagheader, sizeof(TAG_HEADER), 1, ifh);
 
@@ -292,7 +290,9 @@ int simplest_flv_parser(char *url) {
                 }
                 fprintf(myout, "%s", videotag_str);
 
+                // 上面的视频参数占用了一个字节，所以所以回退 1 字节
                 fseek(ifh, -1, SEEK_CUR);
+
                 //if the output file hasn't been opened, open it.
                 if (vfh == NULL && output_v != 0) {
                     //write the flv header (reuse the original file's hdr) and first previoustagsize
@@ -309,8 +309,6 @@ int simplest_flv_parser(char *url) {
                 ts_new = reverse_bytes((byte *)&ts, sizeof(ts));
                 memcpy(&tagheader.Timestamp, ((char *)&ts_new) + 1, sizeof(tagheader.Timestamp));
 #endif
-
-
                 //TagData + Previous Tag Size
                 int data_size = reverse_bytes((byte *) &tagheader.DataSize, sizeof(tagheader.DataSize)) + 4;
                 if (output_v != 0) {
@@ -339,7 +337,6 @@ int simplest_flv_parser(char *url) {
     } while (!feof(ifh));
 
 
-    _fcloseall();
-
+//    _fcloseall();
     return 0;
 }

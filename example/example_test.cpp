@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <fstream>
 
 bool readFile(const std::string &path, std::string &data) {
@@ -17,7 +16,8 @@ bool readFile(const std::string &path, std::string &data) {
 }
 
 int main() {
-    std::string  out;
-    std:: cout << readFile("/Users/linchengzhong/Desktop/query.lua", out) << std::endl;
+    std::string out;
+    std::cout << readFile("/Users/linchengzhong/Desktop/query.lua", out) << std::endl;
     std::cout << out << std::endl;
+    std::cout << sizeof(int) << std::endl;
 }
