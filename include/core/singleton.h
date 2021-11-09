@@ -11,6 +11,7 @@ private:
 
 public:
     virtual ~Singleton() {}
+
     static T *getInstance() {
         static T _inst;
         return &_inst;

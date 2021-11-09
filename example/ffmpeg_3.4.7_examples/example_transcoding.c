@@ -528,8 +528,7 @@ int main(int argc, char **argv) {
             break;
         stream_index = packet.stream_index;
         type = ifmt_ctx->streams[packet.stream_index]->codecpar->codec_type;
-        av_log(NULL, AV_LOG_DEBUG, "Demuxer gave frame of stream_index %u\n",
-               stream_index);
+        av_log(NULL, AV_LOG_DEBUG, "Demuxer gave frame of stream_index %u\n", stream_index);
 
         if (filter_ctx[stream_index].filter_graph) {
             av_log(NULL, AV_LOG_DEBUG, "Going to reencode&filter the frame\n");
@@ -593,7 +592,7 @@ int main(int argc, char **argv) {
     }
 
     av_write_trailer(ofmt_ctx);
-    end:
+end:
     av_packet_unref(&packet);
     av_frame_free(&frame);
     for (i = 0; i < ifmt_ctx->nb_streams; i++) {

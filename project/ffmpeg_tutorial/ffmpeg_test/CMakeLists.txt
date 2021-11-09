@@ -1,1 +1,3 @@
 add_subdirectory(swscale_yuv420p_to_rgb24)
+add_subdirectory(send_rtmp_stream)
+add_subdirectory(yuv_encode_2_h.264)

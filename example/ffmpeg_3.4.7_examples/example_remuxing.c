@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
     }
 
     av_write_trailer(ofmt_ctx);
-    end:
+end:
 
     avformat_close_input(&ifmt_ctx);
 
