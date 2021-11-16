@@ -1,48 +1,83 @@
+#include <algorithm>
+#include <vector>
 #include <cstdio>
-#include <cstdarg>
-#include <cstring>
-#include "string"
+#include <memory>
+#include <mutex>
 
-/**怎样写出一个可以处理像 printf 一样能够处理可变长参数的函数呢。
-看printf的定义:
+class Observable;
 
-int printf(char *fmt， ...)；
+class Observer : public std::enable_shared_from_this<Observer> {
+public:
+    virtual ~Observer();
 
-C语言标准库中头文件 stdarg.h 索引的接口包含了一组能够遍历变长参数列表的宏。主要包含下面几个：
+    virtual void update() = 0;
 
-1、va_list 用来声明一个表示参数表中各个参数的变量。
-2、va_start 初始化一个指针来指向变长参数列表的头一个变量（注意，...只能出现在参数表的最后）
-3、va_arg 每次调用时都会返回当前指针指向的变量，并将指针挪至下一个位置，
-    参数的类型需要在这个调用的第二个参数来指定，va_arg 也是根据这个参数来判断偏移的距离。
-4、va_end 需要在函数最后调用，来进行一些清理工作。**/
+    void observe(Observable *s);
 
-void write_log(char *fmt, ...) {
-    va_list va;
-    char buf[1024];
+protected:
+    Observable *subject_;
+};
 
-    va_start(va, fmt);
-    memset(buf, 0, 1024);
-    (void) vsprintf(buf, fmt, va);
-    va_end(va);
+class Observable {
+public:
+    void register_(std::weak_ptr<Observer> x);
+    // void unregister(std::weak_ptr<Observer> x);
 
-    printf("%s-%s", "my_log_pre_head", buf);
-}
-
-void read_num(int num, ...) {
-    va_list va;             /*point to each unnamed variables in arg list*/
-    va_start(va,num);      /*start va_list from num, and va goes to the second one, and this is the first vary variable*/
-    while (num--) {
-        printf("%d\t", va_arg(va, int)); /*get a arg, va goes to the next*/
+    void notifyObservers() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        Iterator it = observers_.begin();
+        while (it != observers_.end()) {
+            std::shared_ptr<Observer> obj(it->lock()); // 尝试提升，这一步是线程安全的
+            if (obj) {
+                // 提升成功，现在引用计数值至少为 2（想想为什么？）
+                obj->update(); // 没有竞态条件，因为 obj 在栈上，对象不可能在本作用域内销毁
+                ++it;
+            } else {
+                printf("notifyObservers() erase\n");
+                it = observers_.erase(it);
+            }
+        }
     }
-    va_end(va);             /*end the va*/
+
+private:
+    std::mutex mutex_;
+    std::vector<std::weak_ptr<Observer> > observers_;
+    typedef std::vector<std::weak_ptr<Observer> >::iterator Iterator;
+};
+
+Observer::~Observer() {
+    // subject_->unregister(this);
 }
+
+void Observer::observe(Observable *s) {
+    s->register_(shared_from_this());
+    subject_ = s;
+}
+
+void Observable::register_(std::weak_ptr<Observer> x) {
+    observers_.push_back(x);
+}
+
+//void Observable::unregister(std::weak_ptr<Observer> x)
+//{
+//  Iterator it = std::find(observers_.begin(), observers_.end(), x);
+//  observers_.erase(it);
+//}
+
+// ---------------------
+
+class Foo : public Observer {
+    virtual void update() {
+        printf("Foo::update() %p\n", this);
+    }
+};
 
 int main() {
-    std::string match("*$v");
-    write_log("SCAN %d MATCH %s COUNT %d\n", 4, match.c_str(), 100);
-//    read_num(3, 111, 222, 333);
-    return 0;
+    Observable subject;
+    {
+        std::shared_ptr<Foo> p(new Foo);
+        p->observe(&subject);
+        subject.notifyObservers();
+    }
+    subject.notifyObservers();
 }
-// 输出结果：
-// my_log_pre_head-hello world!
-// 111	222	333

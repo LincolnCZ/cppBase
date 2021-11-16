@@ -38,6 +38,12 @@ if (CPPBASE_TEST)
     add_subdirectory(src/utility/test)
     add_subdirectory(src/redistool/test)
 endif ()
+
+# muduo
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+add_subdirectory(muduo/base)
+
 #-------------------------------------end--------------------------------------
 
 # example
@@ -50,7 +56,7 @@ add_subdirectory(example)
 #add_subdirectory(project/mediaproc_lib)
 
 # design pattern
-#add_subdirectory(project/design_pattern)
+add_subdirectory(project/design_pattern)
 
 # socket test
 #add_subdirectory(project/socket)

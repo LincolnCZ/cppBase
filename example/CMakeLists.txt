@@ -13,6 +13,7 @@ add_example_target(std_function)
 #add_example_target(file)
 add_example_target(md5)
 add_example_target(test)
+add_example_target(test2)
 add_example_target(getIpPort_by_proxyId)
 
 #stl
@@ -20,4 +21,3 @@ add_example_target(getIpPort_by_proxyId)
 
 #add_subdirectory(batchWork)
 #add_subdirectory(smart_pointer)
-add_subdirectory(ffmpeg_3.4.7_examples)

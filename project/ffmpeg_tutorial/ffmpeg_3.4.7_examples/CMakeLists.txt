@@ -1,6 +1,8 @@
 # Macro for add example target
 macro(add_ffmpeg_target EXAMPLE_TARGET)
+#    link_directories(${FFMPEG_DIR}/lib)
     add_executable("example_${EXAMPLE_TARGET}" "example_${EXAMPLE_TARGET}.c")
+#    target_include_directories("example_${EXAMPLE_TARGET}" PUBLIC ${FFMPEG_DIR}/include)
     target_link_libraries("example_${EXAMPLE_TARGET}" avdevice avfilter avformat avcodec swresample swscale avutil m)
 endmacro(add_ffmpeg_target)
 
@@ -24,4 +26,5 @@ add_ffmpeg_target(remuxing)
 add_ffmpeg_target(resampling_audio)
 add_ffmpeg_target(scaling_video)
 add_ffmpeg_target(transcode_aac)
+# API example for demuxing, decoding, filtering, encoding and muxing.
 add_ffmpeg_target(transcoding)
