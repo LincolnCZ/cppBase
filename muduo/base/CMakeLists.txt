@@ -33,4 +33,6 @@ target_link_libraries(muduo_base pthread rt)
 
 if(MUDUO_BASE_TESTS)
   add_subdirectory(tests)
+  add_subdirectory(thread_test)
+  add_subdirectory(reactor_test)
 endif()

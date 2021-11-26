@@ -44,7 +44,7 @@ void AsyncLogging::append(const char* logline, int len)
 
     if (nextBuffer_)
     {
-      currentBuffer_ = std::move(nextBuffer_);
+      currentBuffer_ = std::move(nextBuffer_); // 移动而非复制
     }
     else
     {

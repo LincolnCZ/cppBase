@@ -43,6 +43,7 @@ endif ()
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 add_subdirectory(muduo/base)
+add_subdirectory(muduo/net)
 
 #-------------------------------------end--------------------------------------
 
@@ -56,10 +57,10 @@ add_subdirectory(example)
 #add_subdirectory(project/mediaproc_lib)
 
 # design pattern
-add_subdirectory(project/design_pattern)
+#add_subdirectory(project/design_pattern)
 
 # socket test
 #add_subdirectory(project/socket)
 
 # ffmpeg_tutorial
-add_subdirectory(project/ffmpeg_tutorial)
+#add_subdirectory(project/ffmpeg_tutorial)

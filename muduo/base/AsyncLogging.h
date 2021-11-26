@@ -67,9 +67,9 @@ class AsyncLogging : noncopyable
   muduo::CountDownLatch latch_;
   muduo::MutexLock mutex_;
   muduo::Condition cond_ GUARDED_BY(mutex_);
-  BufferPtr currentBuffer_ GUARDED_BY(mutex_);
-  BufferPtr nextBuffer_ GUARDED_BY(mutex_);
-  BufferVector buffers_ GUARDED_BY(mutex_);
+  BufferPtr currentBuffer_ GUARDED_BY(mutex_); // 当前缓冲
+  BufferPtr nextBuffer_ GUARDED_BY(mutex_);    // 预备缓冲
+  BufferVector buffers_ GUARDED_BY(mutex_);    // 待写入文件的已填满的缓冲
 };
 
 }  // namespace muduo

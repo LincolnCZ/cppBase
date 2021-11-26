@@ -1,4 +1,5 @@
 # 以下项目在Mac中运行
+# 库版本更新后需要修改对应路径
 set(SDL_DIR /usr/local/Cellar/sdl2/2.0.16)
 set(SDL_IMAGE_DIR /usr/local/Cellar/sdl2_image/2.0.5)
 set(FFMPEG_DIR /usr/local/Cellar/ffmpeg/4.4_2)

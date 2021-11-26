@@ -19,6 +19,7 @@ namespace FileUtil
 class AppendFile;
 }
 
+// 完成滚动日志；日志刷新功能
 class LogFile : noncopyable
 {
  public:

@@ -79,20 +79,20 @@ class Logger
 
  private:
 
-class Impl
-{
- public:
-  typedef Logger::LogLevel LogLevel;
-  Impl(LogLevel level, int old_errno, const SourceFile& file, int line);
-  void formatTime();
-  void finish();
+  class Impl
+  {
+   public:
+    typedef Logger::LogLevel LogLevel;
+    Impl(LogLevel level, int old_errno, const SourceFile& file, int line);
+    void formatTime();
+    void finish();
 
-  Timestamp time_;
-  LogStream stream_;
-  LogLevel level_;
-  int line_;
-  SourceFile basename_;
-};
+    Timestamp time_;
+    LogStream stream_;
+    LogLevel level_;
+    int line_;
+    SourceFile basename_;
+  };
 
   Impl impl_;
 

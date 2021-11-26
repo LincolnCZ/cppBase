@@ -7,5 +7,7 @@ add_example_target(smart_ptr)
 add_example_target(thread)
 add_example_target(va_list)
 add_example_target(getopt)
+add_example_target(std_bind)
+add_example_target(std_function)
 
 
