@@ -5,16 +5,16 @@ macro(add_example_target EXAMPLE_TARGET)
 #    target_link_libraries("example_${EXAMPLE_TARGET}" pthread crypto)
 endmacro(add_example_target)
 
-add_example_target(hash)
-add_example_target(hash_2_file)
 add_example_target(for_range)
 add_example_target(md5)
 add_example_target(test)
 add_example_target(test2)
-add_example_target(getIpPort_by_proxyId)
 
 #stl
 add_subdirectory(stl)
+
+# yy
+add_subdirectory(yy)
 
 #add_subdirectory(batchWork)
 #add_subdirectory(smart_pointer)

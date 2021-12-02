@@ -4,28 +4,36 @@ Engineering a Reactor
 Step 0: a do-nothing event loop
   EventLoop, assertInLoopThread()
   test1: poll for 10 seconds, creates two threads, each one has an EventLoop
+        在两个线程里各自运行一个Event-Loop
   test2: abort() as it accesses event loop created in a different thread
+        试图在非IO线程调用Event-Loop::loop()，程序崩溃。
 
 Step 1: prototype of reactor
   Channel, Poller, updateChannel().
   test1: poll for ever, creates two threads, each one has an EventLoop
   test2: same as before
   test3: poll a timerfd, which expires in 5 seconds
+        用Channel关注timerfd的可读事件。
 
 Step 2: TimerQueue
   TimerQueue, Timer, TimerId, EventLoop::runAfter, EventLoop::runEvery
   not thread safe
   test4: timer queue unittest
+        TimerQueue示例。
 
 Step 3: wakeup(), runInLoop(), EventLoopThread
   test5: runInLoop(), runAfter() in loop thread
+        IO线程调用EventLoop::runIn-Loop()和EventLoop::runAfter()。
   test6: runInLoop(), runAfter() in a different thread
+        跨线程调用EventLoop::runInLoop()和EventLoop::runAfter()。
 
 Step 4: Acceptor
   test7: listen on port 9981, accept, send, and close
+        Acceptor示例。
 
 Step 5: TcpServer, create TcpConnection
   test8: use of TcpServer, discard server
+        discard服务。
 
 Step 6: TcpConnection passive close
 
@@ -35,19 +43,22 @@ Step 7: TcpConnection read with Buffer, add receiveTime to read callback
 
 Step 8: TcpConnection write
   test9: echo server
+        echo服务。
   test10: data source server
+        发送两次数据，测试TcpConnec-tion::send()。
 
 Step 9: write complete callback, tcp no delay, SIGPIPE
   test11: chargen server
+        chargen服务，使用WriteCom-pleteCallback。
 
 Step 10: multithreaded TcpServer, EventLoopThreadPool
   test8,9,10,11: support multithreads
 
 Step 11: Connector, TimerQueue::cancel()
-  test12:
+  test12: Connector示例。
 
 Step 12: TcpClient
-  test13:
+  test13: TcpClient示例。
 
 Step 13: epoll, EPoller
 

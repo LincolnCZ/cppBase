@@ -13,7 +13,8 @@ inline std::string addr_ntoa(u_long ip) {
 }
 
 int main() {
-    uint64_t proxyId = 0x58bb7d7b2356119e;
+//    uint64_t proxyId = 0x58bb7d7b2356119e; // 743 064 103 258 889 648
+    uint64_t proxyId = 743064103258889648;
     uint32_t port = proxyId & 0x0ffff;
     uint32_t ip = proxyId >> 32;
     cout << "ip:port = " << addr_ntoa(ip) << ":" << port << endl;

@@ -57,7 +57,7 @@ void TcpConnection::connectEstablished()
   assert(state_ == kConnecting);
   setState(kConnected);
   channel_->enableReading();
-   connectionCallback_(shared_from_this());
+  connectionCallback_(shared_from_this());
 }
 
 void TcpConnection::connectDestroyed()

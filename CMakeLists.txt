@@ -41,9 +41,13 @@ endif ()
 
 # muduo
 find_package(Boost REQUIRED)
+find_library(BOOSTTEST_LIBRARY NAMES boost_unit_test_framework)
 include_directories(${Boost_INCLUDE_DIRS})
 add_subdirectory(muduo/base)
 add_subdirectory(muduo/net)
+if(MUDUO_EXAMPLES_TESTS)
+    add_subdirectory(muduo/examples)
+endif()
 
 #-------------------------------------end--------------------------------------
 
