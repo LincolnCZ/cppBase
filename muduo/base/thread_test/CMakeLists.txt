@@ -1,16 +1,7 @@
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_executable(NonRecursiveMutex_test NonRecursiveMutex_test.cpp)
-target_link_libraries(NonRecursiveMutex_test muduo_base)
+# 线程安全的对象生命期管理
+add_subdirectory(Thread-safe_object_lifetime_management)
 
-add_executable(NonRecursiveMutex_fix_d NonRecursiveMutex_fix.cpp)
-target_link_libraries(NonRecursiveMutex_fix_d muduo_base)
-
-add_executable(SelfDeadLock_d SelfDeadLock.cpp)
-target_link_libraries(SelfDeadLock_d muduo_base)
-
-add_executable(MutualDeadLock_d MutualDeadLock.cpp)
-target_link_libraries(MutualDeadLock_d muduo_base)
-
-add_executable(MutualDeadLock_fix_d MutualDeadLock_fix.cpp)
-target_link_libraries(MutualDeadLock_fix_d muduo_base)
+# 线程同步精要
+add_subdirectory(copy-on-write)

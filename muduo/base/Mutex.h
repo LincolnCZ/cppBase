@@ -146,19 +146,19 @@ class CAPABILITY("mutex") MutexLock : noncopyable
 
   // internal usage
 
-  void lock() ACQUIRE()
+  void lock() ACQUIRE() // 仅供 MutexLockGuard 调用，严禁用户代码调用
   {
-    MCHECK(pthread_mutex_lock(&mutex_));
+    MCHECK(pthread_mutex_lock(&mutex_)); // 这两行顺序不能反
     assignHolder();
   }
 
-  void unlock() RELEASE()
+  void unlock() RELEASE()  // 仅供 MutexLockGuard 调用，严禁用户代码调用
   {
-    unassignHolder();
+    unassignHolder();  // 这两行顺序不能反
     MCHECK(pthread_mutex_unlock(&mutex_));
   }
 
-  pthread_mutex_t* getPthreadMutex() /* non-const */
+  pthread_mutex_t* getPthreadMutex() /* non-const */ // 仅供 Condition 调用，严禁用户代码调用
   {
     return &mutex_;
   }
