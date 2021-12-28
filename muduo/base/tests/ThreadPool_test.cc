@@ -3,7 +3,7 @@
 #include "muduo/base/CurrentThread.h"
 #include "muduo/base/Logging.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>  // usleep
 
 void print()

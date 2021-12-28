@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 class Test

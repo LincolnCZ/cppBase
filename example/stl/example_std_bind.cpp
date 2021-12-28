@@ -16,6 +16,10 @@ struct Foo {
         std::cout << n1 + n2 << '\n';
     }
 
+    static void print(const std::string &str) {
+        std::cout << "print : " << str << std::endl;
+    }
+
     int data = 10;
 };
 
@@ -43,16 +47,23 @@ int main() {
         std::cout << rnd() << ' '; // 输出：1 5 0 2 0 8 2 2 10 8
     std::cout << '\n';
 
+    ///
     std::cout << "4) bind to a pointer to member function: ";
     Foo foo;
     // bind绑定类成员函数时，第一个参数表示对象的成员函数的指针，第二个参数表示对象的地址，这是因为对象的成员函数需要有this指针。
     auto f4 = std::bind(&Foo::print_sum, &foo, 95, _1);
     f4(5); // 输出：100
 
+    ///
     std::cout << "5) bind to a pointer to data member: ";
     auto f5 = std::bind(&Foo::data, _1);
     std::cout << f5(foo) << '\n'; // 输出：10
 
+    ///
     std::cout << "6) use smart pointers to call members of the referenced objects: ";
     std::cout << f5(std::make_shared<Foo>(foo)) << '\n';// 输出：10
+
+    auto f6 = std::bind(&Foo::print, _1); // static 成员函数，不需要指定对象地址
+    std::cout << "7) static member function : ";
+    f6("hello");
 }

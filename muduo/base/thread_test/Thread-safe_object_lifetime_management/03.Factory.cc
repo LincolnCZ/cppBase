@@ -87,7 +87,7 @@ class StockFactory : muduo::noncopyable
 
 }
 
-//存在问题：那就是我们把一个原始的StockFactorythis指针保存在了boost::function里（***处），
+//存在问题：那就是我们把一个原始的StockFactory this指针保存在了boost::function里（***处），
 //这会有线程安全问题。如果这个Stock Factory先于Stock对象析构，那么会core dump。
 //正如Observer在析构函数里去调用Observable::unregister()，而那时Observable对象可能已经不存在了。
 namespace version3
@@ -105,7 +105,7 @@ class StockFactory : muduo::noncopyable
     if (!pStock)
     {
       pStock.reset(new Stock(key),
-                   std::bind(&StockFactory::deleteStock, this, _1));
+                   std::bind(&StockFactory::deleteStock, this, _1)); // ***
       wkStock = pStock;
     }
     return pStock;

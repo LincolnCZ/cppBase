@@ -27,11 +27,11 @@ int main() {
     std::function<void(int)> f_display = print_num;
     f_display(-9); // 输出：-9
 
-    // (2) store a lambda
+    /// (2) store a lambda
     std::function<void()> f_display_42 = []() { print_num(42); };
     f_display_42(); // 输出：42
 
-    // (3) store the result of a call to std::bind
+    /// (3) store the result of a call to std::bind
     std::function<void()> f_display_31337 = std::bind(print_num, 31337);
     f_display_31337(); // 输出：31337
 
@@ -50,7 +50,7 @@ int main() {
     std::function<void(int)> f_add_display2 = std::bind(&Foo::print_add, foo, _1);
     f_add_display2(2); // 输出：314161
 
-    // (7) store a call to a member function and object ptr
+    /// (7) store a call to a member function and object ptr
     std::function<void(int)> f_add_display3 = std::bind(&Foo::print_add, &foo, _1);
     f_add_display3(3); // 输出：314162
 
