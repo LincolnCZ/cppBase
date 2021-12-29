@@ -1,3 +1,4 @@
+syntax = "proto2"; //表明使用protobuf的编译器版本为v2
 package muduo;
 option java_package = "muduo.codec.tests";
 option java_outer_classname = "QueryProtos";

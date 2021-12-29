@@ -1,14 +1,36 @@
 #include <mutex>
 #include <iostream>
+#include <memory>
+#include <unordered_set>
+
+using namespace std;
+
+void f(const std::shared_ptr<int> &p) {
+    cout << "in f use count:" << p.use_count() << endl;
+}
+
 
 int main() {
-    const int max_name = 80;
-    char name[max_name];
+    std::shared_ptr<int> sP(new int(26));
+    cout << "sp use count:" << sP.use_count() << endl;
+    std::weak_ptr<int> wP(sP);
 
-    char fmt[10];
-    sprintf(fmt, "%%%ds", max_name - 1);
-    std::cout << "fmt:" << fmt << std::endl;
-    scanf(fmt, name);
-    printf("%s\n", name);
-    std::cout << "name:" << name << std::endl;
+    std::unordered_set<std::shared_ptr<int>> bucket;
+    {
+        std::shared_ptr<int> sP1(wP.lock());
+        cout << "sp1 use count:" << sP1.use_count() << endl;
+        bucket.insert(sP1);
+        for (auto it = bucket.begin(); it != bucket.end(); ++it) {
+            cout << "bucket use count :" << it->use_count() << endl;
+        }
+    }
+    {
+        std::shared_ptr<int> sP2(wP.lock());
+        cout << "sp2 use count:" << sP2.use_count() << endl;
+
+        bucket.insert(sP2);
+        for (auto it = bucket.begin(); it != bucket.end(); ++it) {
+            cout << "bucket use count :" << it->use_count() << endl;
+        }
+    }
 }

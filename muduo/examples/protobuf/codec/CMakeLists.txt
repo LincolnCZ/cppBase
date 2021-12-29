@@ -1,18 +1,32 @@
+set(PROTOBUF_DIR ${PROJECT_SOURCE_DIR}/3rd/protobuf-3.19.0)
+link_directories(${PROTOBUF_DIR}/lib)
+
+# ----------直接使用命令生成的方式---------
+#add_custom_command(OUTPUT query.pb.cc query.pb.h
+#  COMMAND protoc
+#  ARGS --cpp_out . ${CMAKE_CURRENT_SOURCE_DIR}/query.proto -I${CMAKE_CURRENT_SOURCE_DIR}
+#  DEPENDS query.proto
+#  VERBATIM )
+#
+#set_source_files_properties(query.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-shadow")
+#include_directories(${PROJECT_BINARY_DIR})
+#include_directories(/usr/include)
+# -----------end-----------------------
+
+# 编解码器
 add_library(protobuf_codec codec.cc)
+target_include_directories(protobuf_codec PUBLIC ${PROTOBUF_DIR}/include)
 target_link_libraries(protobuf_codec protobuf muduo_net z)
 
-add_custom_command(OUTPUT query.pb.cc query.pb.h
-  COMMAND protoc
-  ARGS --cpp_out . ${CMAKE_CURRENT_SOURCE_DIR}/query.proto -I${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS query.proto
-  VERBATIM )
-
-set_source_files_properties(query.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-shadow")
-include_directories(${PROJECT_BINARY_DIR})
-include_directories(/usr/include)
-
+# pb协议
 add_library(query_proto query.pb.cc)
+target_include_directories(query_proto PUBLIC ${PROTOBUF_DIR}/include)
 target_link_libraries(query_proto protobuf pthread)
+
+# 测试pb协议解析
+add_executable(descriptor_test_d test/descriptor_test.cc)
+set_target_properties(descriptor_test_d PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
+target_link_libraries(descriptor_test_d query_proto)
 
 add_executable(protobuf_codec_test codec_test.cc)
 set_target_properties(protobuf_codec_test PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")

@@ -1,3 +1,7 @@
+# 重新设置CMAKE_CXX_FLAGS，忽略告警
+set(CMAKE_CXX_FLAGS "-g1 -O2 -DNDEBUG -Wall -std=c++11")
+
+# 头文件路径
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/muduo)
 
@@ -7,4 +11,7 @@ add_subdirectory(filetransfer)
 add_subdirectory(asio/chat)
 add_subdirectory(asio/tutorial)
 add_subdirectory(protobuf)
+add_subdirectory(maxconnection)
+add_subdirectory(idleconnection)
+add_subdirectory(hub)
 

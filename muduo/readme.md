@@ -1,4 +1,4 @@
-muduo release v2.0.2 版本，base库
+muduo release v2.0.2 版本
 
 ## 目录说明
 examples：使用例子
@@ -23,8 +23,12 @@ examples：使用例子
   * download3.cc：同2，但是采用shared_ptr来管理FILE*，避免手动调用::fclose(3)。
 * asio
   * char：主要目的是介绍如何处理分包。chat实现了TCP封包与拆包（codec）。
-  * tutorial:
-
+  * tutorial：
+* protobuf
+  * codec：
+* maxconnection：限制服务器的最大并发连接数例子
+* idleconnection：用timing wheel踢掉空闲连接
+* hub：简单的消息广播服务
 
 
 
