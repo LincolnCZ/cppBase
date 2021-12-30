@@ -76,6 +76,6 @@ message(STATUS "muduo_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 
 add_subdirectory(base)
 add_subdirectory(net)
-if(MUDUO_EXAMPLES_TESTS)
+if(MUDUO_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

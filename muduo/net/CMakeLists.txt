@@ -59,7 +59,7 @@ set_target_properties(muduo_net PROPERTIES COMPILE_FLAGS "-std=c++0x")
 add_subdirectory(http)
 add_subdirectory(inspect)
 
-if(MUDUO_NET_TESTS)
+if(MUDUO_BUILD_EXAMPLES)
   add_subdirectory(tests)
 endif()
 

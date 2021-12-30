@@ -14,4 +14,8 @@ add_subdirectory(protobuf)
 add_subdirectory(maxconnection)
 add_subdirectory(idleconnection)
 add_subdirectory(hub)
+add_subdirectory(multiplexer)
+add_subdirectory(socks4a)
+add_subdirectory(shorturl)
+add_subdirectory(muduo-udns)
 
