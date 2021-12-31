@@ -5,11 +5,6 @@
 
 using namespace std;
 
-void f(const std::shared_ptr<int> &p) {
-    cout << "in f use count:" << p.use_count() << endl;
-}
-
-
 int main() {
     std::shared_ptr<int> sP(new int(26));
     cout << "sp use count:" << sP.use_count() << endl;
@@ -34,3 +29,7 @@ int main() {
         }
     }
 }
+
+
+
+
