@@ -14,7 +14,7 @@ endif ()
 add_subdirectory(cppBase)
 
 # muduo
-add_subdirectory(muduo)
+#add_subdirectory(muduo)
 
 #-----------------------------------其他项目----------------------------------
 # example
@@ -34,6 +34,8 @@ add_subdirectory(example)
 
 # ffmpeg_tutorial
 #add_subdirectory(project/ffmpeg_tutorial)
+
+add_subdirectory(project/data_structures_and_algorithms)
 
 #--------------------------------常用cmake 选项说明---------------------------
 # PROJECT_SOURCE_DIR：项目的根目录
