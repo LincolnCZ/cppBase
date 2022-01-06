@@ -48,6 +48,8 @@ class TimeClient : noncopyable
     }
   }
 
+  // 注意其中考虑到了如果数据没有一次性收全，已经收到的数据会累积在Buffer里（在else分支里没有调用Buffer::retrieve*系列函数），
+  // 以等待后续数据到达，程序也不会阻塞。这样即便服务器一个字节一个字节地发送数据，代码还是能正常工作，这也是非阻塞网络编程必须在用户态使用接收缓冲的主要原因。
   void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime)
   {
     if (buf->readableBytes() >= sizeof(int32_t))

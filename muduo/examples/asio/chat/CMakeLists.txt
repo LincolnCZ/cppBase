@@ -11,6 +11,7 @@ target_link_libraries(asio_chat_loadtest muduo_net)
 
 # 使用多线程TcpServer，并用mutex来保护共享数据。
 add_executable(asio_chat_server_threaded server_threaded.cc)
+target_link_libraries(asio_chat_server_threaded muduo_net)
 
 # 对共享数据以§2.8“借shared_ptr实现copy-on-write”的手法来降低锁竞争。
 add_executable(asio_chat_server_threaded_efficient server_threaded_efficient.cc)

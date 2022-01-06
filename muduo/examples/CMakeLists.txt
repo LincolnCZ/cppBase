@@ -5,6 +5,11 @@ set(CMAKE_CXX_FLAGS "-g1 -O2 -DNDEBUG -Wall -std=c++11")
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/muduo)
 
+# 测试
+add_subdirectory(thread_test)
+add_subdirectory(reactor_test)
+
+# 网络库使用相关
 add_subdirectory(sudoku)
 add_subdirectory(simple)
 add_subdirectory(filetransfer)

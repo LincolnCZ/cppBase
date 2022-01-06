@@ -14,7 +14,7 @@ endif ()
 add_subdirectory(cppBase)
 
 # muduo
-#add_subdirectory(muduo)
+add_subdirectory(muduo)
 
 #-----------------------------------其他项目----------------------------------
 # example

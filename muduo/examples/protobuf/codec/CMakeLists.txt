@@ -13,11 +13,6 @@ link_directories(${PROTOBUF_DIR}/lib)
 #include_directories(/usr/include)
 # -----------end-----------------------
 
-# 编解码器
-add_library(protobuf_codec codec.cc)
-target_include_directories(protobuf_codec PUBLIC ${PROTOBUF_DIR}/include)
-target_link_libraries(protobuf_codec protobuf muduo_net z)
-
 # pb协议
 add_library(query_proto query.pb.cc)
 target_include_directories(query_proto PUBLIC ${PROTOBUF_DIR}/include)
@@ -28,6 +23,12 @@ add_executable(descriptor_test_d test/descriptor_test.cc)
 set_target_properties(descriptor_test_d PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(descriptor_test_d query_proto)
 
+# 编解码器
+add_library(protobuf_codec codec.cc)
+target_include_directories(protobuf_codec PUBLIC ${PROTOBUF_DIR}/include)
+target_link_libraries(protobuf_codec protobuf muduo_net z)
+
+# test 编解码器
 add_executable(protobuf_codec_test codec_test.cc)
 set_target_properties(protobuf_codec_test PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(protobuf_codec_test protobuf_codec query_proto)
@@ -36,14 +37,17 @@ add_executable(protobuf_dispatcher_lite_test dispatcher_lite_test.cc)
 set_target_properties(protobuf_dispatcher_lite_test PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(protobuf_dispatcher_lite_test query_proto)
 
+# test 消息分发器
 add_executable(protobuf_dispatcher_test dispatcher_test.cc)
 set_target_properties(protobuf_dispatcher_test PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(protobuf_dispatcher_test query_proto)
 
+# 服务器端
 add_executable(protobuf_server server.cc)
 set_target_properties(protobuf_server PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(protobuf_server protobuf_codec query_proto)
 
+# 客户端
 add_executable(protobuf_client client.cc)
 set_target_properties(protobuf_client PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
 target_link_libraries(protobuf_client protobuf_codec query_proto)

@@ -30,6 +30,4 @@ set_target_properties(muduo_base PROPERTIES COMPILE_FLAGS "-std=c++0x")
 
 if(MUDUO_BUILD_EXAMPLES)
   add_subdirectory(tests)
-  add_subdirectory(thread_test)
-  add_subdirectory(reactor_test)
 endif()

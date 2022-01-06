@@ -18,6 +18,9 @@ class LengthHeaderCodec : muduo::noncopyable
   {
   }
 
+  // 本聊天服务的消息格式非常简单，“消息”本身是一个字符串，每条消息有一个4字节的头部，以网络序存放字符串的长度。
+  // 消息之间没有间隙，字符串也不要求以'\0'结尾。
+  //
   // 以两条消息的字节流为例：
   //    0x00, 0x00, 0x00, 0x05, 'h', 'e', 'l', 'l', 'o',
   //    0x00, 0x00, 0x00, 0x08, 'c', 'h', 'e', 'n', 's', 'h', 'u', 'o'
@@ -34,6 +37,8 @@ class LengthHeaderCodec : muduo::noncopyable
                  muduo::net::Buffer* buf,
                  muduo::Timestamp receiveTime)
   {
+    // while循环来反复读取数据，直到Buffer中的数据不够一条完整的消息。
+    // 请读者思考，如果换成if (buf->readableBytes()>=kHeaderLen)会有什么后果。
     while (buf->readableBytes() >= kHeaderLen) // kHeaderLen == 4
     {
       // FIXME: use Buffer::peekInt32()
