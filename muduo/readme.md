@@ -1,12 +1,20 @@
 muduo release v2.0.2 版本
 
-## 目录说明
+## 目录
+base：muduo release v2.0.2 版本 base 目录
+net：muduo release v2.0.2 版本 net 目录
+
+## example 目录说明
 examples：使用例子
+* reactor_test：说明muduo库的设计和实现过程
+* thread_test：
+  * **Thread-safe_object_lifetime_manager**：对象生命周期管理
+  * **copy-on-write**：shared_ptr 实现写时复制
 * python： python 例子，说明网络并发模式
   * 00_echo-iterative.py：accept+read/write 并发模式 
   * 01_echo-fork.py
   * 02_echo-thread.py
-* sudoku：说明网络并发模式
+* **sudoku**：说明网络并发模式
   * 05_server_basic.cc
   * 08_server_threadpoll.cc
   * 09_server_multiloop.cc
@@ -29,18 +37,16 @@ examples：使用例子
   * download2.cc：一块一块地发送文件，减少内存使用，用到了WriteCompleteCallback。这个版本满足了上述全部健壮性要求。
   * download3.cc：同2，但是采用shared_ptr来管理FILE*，避免手动调用::fclose(3)。
 * asio
-  * chat：主要目的是介绍如何处理分包。chat实现了TCP封包与拆包（codec）。
+  * **chat**：主要目的是介绍如何处理分包。chat实现了TCP封包与拆包（codec）。
     * server_threaded.cc：使用多线程TcpServer，并用mutex来保护共享数据。
     * server_threaded_efficient.cc：对共享数据以§2.8“借shared_ptr实现copy-on-write”的手法来降低锁竞争。 
     * server_threaded_highperformance.cc：采用thread local变量，实现多线程高效转发，这个例子值得仔细阅读理解。
 * protobuf
-  * codec：
-* 
-* 
-* 
-* 
+  * **codec**：
 * maxconnection：限制服务器的最大并发连接数例子
-* idleconnection：用timing wheel踢掉空闲连接
+* asio
+  * tutorial：
+* **idleconnection**：用timing wheel踢掉空闲连接
 * hub：简单的消息广播服务
 
 

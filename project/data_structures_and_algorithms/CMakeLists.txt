@@ -1,1 +1,2 @@
 add_subdirectory(DataStructsAndAlgorithmsAnalysisInC++)
+add_subdirectory(struct)
