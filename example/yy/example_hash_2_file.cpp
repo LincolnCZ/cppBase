@@ -62,11 +62,12 @@ int main(int) {
 
     //从in.txt　文件中读入数据，并输出到out.txt中
     while (getline(inf, line)) {
-        int ret = hashChannelGroup(line, groups);
+        int old_group = hashChannelGroup(line, groups);
 
         set<uint32_t> newGroups{0, 1, 2, 3, 4, 5};
         int new_group = hashChannelGroup(line, newGroups);
-        outf << "liveId : " << line << " dm_group:" << ret << ", new_group:" << new_group << '\n';
+        if (old_group != new_group)
+            outf << "liveId : " << line << " dm_group:" << old_group << ", new_group:" << new_group << '\n';
     }
 
     inf.close();

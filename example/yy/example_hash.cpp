@@ -33,9 +33,9 @@ uint32_t hashChannelGroup(const string &channel, const std::set<uint32_t> &group
     uint32_t groupId = 0;
     for (std::set<uint32_t>::iterator it = groups.begin(); it != groups.end(); ++it) {
         uint32_t h = hash_string(*it, channel.c_str());
-        cout << "groupId index: " << *it << "\thash_string :" << h << endl;
+//        cout << "groupId index: " << *it << "\thash_string :" << h << endl;
         h = hash_int(h);
-        cout << "hash_int :" << h << endl;
+//        cout << "hash_int :" << h << endl;
         if (h > maxHash) {
             maxHash = h;
             groupId = *it;
@@ -46,6 +46,6 @@ uint32_t hashChannelGroup(const string &channel, const std::set<uint32_t> &group
 
 int main() {
     set<uint32_t> groups{0, 1};
-    string channelId = "123234"; //    87103145
+    string channelId = "16719_0330070134_r1"; //    87103145
     cout << "hash chose : " << hashChannelGroup(channelId, groups);
 }

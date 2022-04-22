@@ -49,8 +49,7 @@ void lt_process(struct epoll_event *events, int number, int epoll_fd, int listen
     for (i = 0; i < number; i++) //number: number of events ready
     {
         int sockfd = events[i].data.fd;
-        if (sockfd ==
-            listen_fd)  //If it is a file descriptor for listen, it indicates that a new customer is connected to
+        if (sockfd == listen_fd) //If it is a file descriptor for listen, it indicates that a new customer is connected to
         {
             struct sockaddr_in client_address;
             socklen_t client_addrlength = sizeof(client_address);
@@ -69,7 +68,6 @@ void lt_process(struct epoll_event *events, int number, int epoll_fd, int listen
                 continue;
             }
             printf("get %d bytes of content: %s\n", ret, buf);
-
         } else {
             printf("something unexpected happened!\n");
         }

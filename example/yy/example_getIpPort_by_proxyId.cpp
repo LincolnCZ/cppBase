@@ -11,9 +11,17 @@ inline std::string addr_ntoa(u_long ip) {
 }
 
 int main() {
-//    uint64_t proxyId = 0x58bb7d7b2356119e; // 743 064 103 258 889 648
-    uint64_t proxyId = 0xa753e4dd1dec9d62;
-    uint32_t port = proxyId & 0x0ffff;
+    uint64_t proxyId = 5169983294899953072;
+    uint16_t port = proxyId & 0xffff;
+    uint16_t listenport = (proxyId >> 16) & 0xffff;
     uint32_t ip = proxyId >> 32;
-    cout << "ip:port = " << addr_ntoa(ip) << ":" << port << endl;
+    cout << "ip:port = " << addr_ntoa(ip) << ":" << port << ", listenport:" << listenport << endl;
+
+
+    uint64_t conn_id = ((uint64_t) ip << 32) |
+                       ((uint64_t) listenport << 16) | (uint64_t) port;
+    cout << "connId:" << conn_id << endl;
+
+    long uri = 1019 << 8 | 80;
+    cout << "uri:" << uri << endl;
 }

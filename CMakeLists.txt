@@ -14,7 +14,7 @@ endif ()
 add_subdirectory(cppBase)
 
 # muduo
-#add_subdirectory(muduo)
+add_subdirectory(muduo)
 
 #-----------------------------------其他项目----------------------------------
 # example
@@ -30,7 +30,7 @@ add_subdirectory(example)
 #add_subdirectory(project/design_pattern)
 
 # socket test
-#add_subdirectory(project/socket)
+add_subdirectory(project/socket)
 
 # ffmpeg_tutorial
 #add_subdirectory(project/ffmpeg_tutorial)
