@@ -1,4 +1,4 @@
-# 一个线程安全的Counter示例--单线程安全
+# Counter示例--单线程安全--多线程有问题
 add_executable(Counter_d 01.Counter.cc)
 target_link_libraries(Counter_d muduo_base)
 
@@ -13,6 +13,10 @@ target_link_libraries(Observer_safe_d muduo_base)
 # 对象池
 add_executable(Factory_d 03.Factory.cc)
 target_link_libraries(Factory_d muduo_base)
+
+#
+add_executable(SignalSlot_test_d 04.SignalSlot_test.cpp)
+target_link_libraries(SignalSlot_test_d muduo_base)
 
 # 通用的弱回调封装
 #add_executable(WeakCallback_d 05.WeakCallback.h)

@@ -1,8 +1,8 @@
 # 非递归锁存在的死锁情况
-add_executable(NonRecursiveMutex_test_d 01.NonRecursiveMutex_test.cc)
+add_executable(NonRecursiveMutex_test_d 01.NonRecursiveMutex.cc)
 target_link_libraries(NonRecursiveMutex_test_d muduo_base)
 
-# 解决非递归锁存在的死锁
+# 解决非递归锁存在的死锁---借shared_ptr实现copy-on-write
 add_executable(NonRecursiveMutex_fix_d 01.NonRecursiveMutex_fix.cc)
 target_link_libraries(NonRecursiveMutex_fix_d muduo_base)
 

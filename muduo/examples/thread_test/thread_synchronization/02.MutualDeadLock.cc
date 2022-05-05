@@ -1,15 +1,15 @@
-// 这个例子存在两种死锁的可能：
-//1)第一种
-//  main()线程是先调用Inventory::printAll(#6)再调用Request::print(#5)，
-//  而threadFunc()线程是先调用Request::~Request(#6)再调用Inventory::remove(#5)。
-//  这两个调用序列对两个mutex的加锁顺序正好相反，于是造成了经典的死锁。
-//2)第二种
-//  main()线程是先调用Inventory::printAll(#6)再调用Request::print(#5)，
-//  而threadFunc()线程先调用Request::process()，再调用Inventory::add()。
-//  这两个调用序列对两个mutex的加锁顺序正好相反，于是造成了经典的死锁。
-//
-// 析构函数中存在race condition
-//
+/// 这个例子存在两种死锁的可能：
+///1)第一种
+///  main()线程是先调用Inventory::printAll(#6)再调用Request::print(#5)，
+///  而threadFunc()线程是先调用Request::~Request(#6)再调用Inventory::remove(#5)。
+///  这两个调用序列对两个mutex的加锁顺序正好相反，于是造成了经典的死锁。
+///2)第二种
+///  main()线程是先调用Inventory::printAll(#6)再调用Request::print(#5)，
+///  而threadFunc()线程先调用Request::process()，再调用Inventory::add()。
+///  这两个调用序列对两个mutex的加锁顺序正好相反，于是造成了经典的死锁。
+///
+/// 析构函数中存在race condition
+///
 
 #include <set>
 #include <cstdio>

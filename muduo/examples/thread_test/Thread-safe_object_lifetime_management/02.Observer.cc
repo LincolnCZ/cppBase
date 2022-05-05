@@ -2,13 +2,13 @@
 #include <vector>
 #include <cstdio>
 
-// 存在3个问题：
-// (1) 见代码中位置
-// (2)   • 线程A执行到 ~Observer()，还没有来得及unregister本对象。
-//       • 线程B执行到 notifyObservers()函数，用 x->update()，x正好指向是正在析构的对象。
-//      这时悲剧又发生了，既然x所指的Observer对象正在析构，调用它的任何非静态成员函数都是不安全的，何况是虚函数。
-//      更糟糕的是，Observer是个基类，执行到~Observer()时，派生类对象已经析构掉了，这时候整个对象处于将死未死的状态，core dump恐怕是最幸运的结果。
-// (3) 见代码中位置
+/// 存在3个问题：
+///     (1) 见代码中位置
+///     (2)   • 线程A执行到 ~Observer()，还没有来得及unregister本对象。
+///           • 线程B执行到 notifyObservers()函数，用 x->update()，x正好指向是正在析构的对象。
+///          这时悲剧又发生了，既然x所指的Observer对象正在析构，调用它的任何非静态成员函数都是不安全的，何况是虚函数。
+///           更糟糕的是，Observer是个基类，执行到~Observer()时，派生类对象已经析构掉了，这时候整个对象处于将死未死的状态，core dump恐怕是最幸运的结果。
+///     (3) 见代码中位置
 
 class Observable;
 
@@ -36,7 +36,7 @@ class Observable
     {
       Observer* x = observers_[i];
       if (x) {
-        x->update(); // (3)当Observable通知每一个Observer时，它从何得知Observer对象x还活着？
+        x->update(); /// (3)当Observable通知每一个Observer时，它从何得知Observer对象x还活着？
       }
     }
   }
@@ -47,7 +47,7 @@ class Observable
 
 Observer::~Observer()
 {
-  subject_->unregister(this); // (1)如何得知subject_还活着？
+  subject_->unregister(this); /// (1)如何得知subject_还活着？
 }
 
 void Observer::observe(Observable* s)

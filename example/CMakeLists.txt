@@ -24,7 +24,7 @@ add_subdirectory(yy)
 
 # 其他测试项目
 add_subdirectory(batchWork)
-#add_subdirectory(smart_pointer)
+add_subdirectory(smart_pointer)
 
 # protobuf
 #if (PROTOBUF_FOUND)

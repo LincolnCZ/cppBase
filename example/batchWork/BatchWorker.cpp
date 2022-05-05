@@ -17,7 +17,6 @@ std::vector<std::vector<int>> fake_result(const std::vector<std::vector<int>> &i
     return result;
 }
 
-
 static int64_t getTimeNow() {
     struct timeval tv{};
     gettimeofday(&tv, nullptr);

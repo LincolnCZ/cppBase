@@ -2,6 +2,7 @@
 using muduo::MutexLock;
 using muduo::MutexLockGuard;
 
+/// 问题：单线程安全的 Counter 示例，多线程时是有问题的
 // A thread-safe counter
 class Counter : muduo::noncopyable
 {
@@ -33,7 +34,9 @@ int64_t Counter::getAndIncrease()
   return ret;
 }
 
-// 可能存在死锁的情况
+/// 可能存在死锁的情况
+///
+/// 如果线程A执行swap(a, b)；而同时线程B执行swap(b,a)；就有可能死锁。
 void swap(Counter& a, Counter& b)
 {
   MutexLockGuard aLock(a.mutex_);  // potential dead lock

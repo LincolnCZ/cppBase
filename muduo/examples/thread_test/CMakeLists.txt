@@ -4,4 +4,4 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_subdirectory(Thread-safe_object_lifetime_management)
 
 # 线程同步精要
-add_subdirectory(copy-on-write)
+add_subdirectory(thread_synchronization)

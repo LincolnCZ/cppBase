@@ -5,6 +5,8 @@
 #include <map>
 #include <complex>
 #include <list>
+#include <set>
+#include <unordered_set>
 
 using namespace std;
 
@@ -60,47 +62,61 @@ std::ostream &operator<<(std::ostream &ostr, const std::list<int> &list) {
 ///--------------------------------------------------------------------------------
 
 
-class Solution {
-public:
-    int result = 0;
-    int movingCount(int m, int n, int k) {
-        vector<vector<bool>> visited(m, vector<bool>(n, false));
-        dfs(0, 0, m, n, k, visited);
-        return result;
+//weight: 物品重量，n: 物品个数，w: 背包可承载重量
+int knapsack(vector<int> &weight, int n, int w) {
+    //记录状态
+    vector<vector<bool>> dp(n, vector<bool>(w + 1, false));
+    //第 0 个物品
+    for (int i = 0; i < w / weight[0]; ++i) {
+        dp[0][i * weight[0]] = true;
     }
-
-    void dfs(int row, int col, int m, int n, int k, vector<vector<bool>>& visited){
-        visited[row][col] = true;
-        result++;
-
-        vector<vector<int>> directions= {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for(int i = 0; i < 4; ++i){
-            int newRow = row + directions[i][0];
-            int newCol = col + directions[i][1];
-
-            cout << "newRow:" << newRow << " newCol:" << newCol << endl;
-
-            if(newRow < 0 || newRow >= m || newCol < 0 || newCol >= n
-               || visited[newRow][newCol]
-               || !valid(newRow, newCol, k)) {
-                continue;
+    // 状态转移
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j <= w; ++j) {
+            int k = j / weight[i];
+            for (int c = 0; c < k; ++c) {
+                if (dp[i - 1][j - c * weight[i]]) {
+                    dp[i][j] = true;
+                    break;
+                }
             }
-            dfs(newRow, newCol, m, n, k, visited);
         }
     }
-
-    static bool valid(int row, int col, int k){
-        int sum = row%10 + row/10 + col%10 + col/10;
-        return sum <= k;
+    // 返回结果
+    for (int j = w; j >= 0; --j) {
+        if (dp[n - 1][j]) return j;
     }
-};
+    return 0;
+}
 
 
 int main() {
-    Solution s;
-    cout <<"result:" << s.movingCount(1,2,1) << endl;
-    int row = 0, col = 1;
-    cout << s.valid(0, 1, 1) << endl;
+
 }
+
+
+template<typename Signature>
+class SignalTrivial;
+
+// NOT thread safe !!!
+template<typename RET, typename... ARGS>
+class SignalTrivial<RET(ARGS...)> {
+public:
+    typedef std::function<void(ARGS...)> Functor;
+
+    void connect(Functor &&func) {
+        functors_.push_back(std::forward<Functor>(func));
+    }
+
+    void call(ARGS &&... args) {
+        for (const Functor &f: functors_) {
+            f(args...);
+        }
+    }
+
+private:
+    std::vector<Functor> functors_;
+};
+
 
 

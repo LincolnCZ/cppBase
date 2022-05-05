@@ -26,14 +26,14 @@ int main(int argc, char **argv) {
     TestPtr ptr(new Test);
     std::cout << "main ptr count:" << ptr.use_count() << std::endl;
 
-    // 不预绑定的参数要用std::placeholders(占位符)的形式占位，从_1开始，依次递增，是以引用传递的形式；
+    /// 不预绑定的参数要用std::placeholders(占位符)的形式占位，从_1开始，依次递增，是以引用传递的形式；
     FuncRef funcRef;
     {
         funcRef = std::bind(&Foo::print, &f, _1, _2);
     }
     funcRef(ptr, "hello");
 
-    // 预绑定的参数是以值传递的形式
+    /// 预绑定的参数是以值传递的形式
     FuncVal funcVal;
     {
         std::string str("world");
