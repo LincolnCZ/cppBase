@@ -10,7 +10,6 @@
  *      这一点和一个冒号时是有区别的。*/
 
 int main(int argc, char *argv[]) {
-
     int ch;
     printf("\n\n");
     printf("optind:%d，opterr：%d\n", optind, opterr);

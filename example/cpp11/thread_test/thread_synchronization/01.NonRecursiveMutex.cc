@@ -1,15 +1,14 @@
 /// 存在问题：如果Foo::doit()间接调用了post()，那么会很有戏剧性的结果：
-///         1. mutex是非递归的，于是死锁了。
-///         2. mutex是递归的，由于push_back()可能（但不总是）导致vector迭代器失效，程序偶尔会crash。
+///     1. mutex是非递归的，于是死锁了。
+///     2. mutex是递归的，由于push_back()可能（但不总是）导致vector迭代器失效，程序偶尔会crash。
 ///
 /// 解决方法：如果确实需要在遍历的时候修改vector，有两种做法：
-///     一是把修改推后，记住循环中试图添加或删除哪些元素，等循环结束了再依记录修改foos；
+///     一是把修改推后，记住循环中试图添加或删除哪些元素，等循环结束了再依记录修改 foos；
 ///     二是用copy-on-write
 
 #include "muduo/base/Mutex.h"
 #include "muduo/base/Thread.h"
 #include <vector>
-#include <stdio.h>
 
 using namespace muduo;
 

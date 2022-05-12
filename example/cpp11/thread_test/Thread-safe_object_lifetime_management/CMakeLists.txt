@@ -1,4 +1,4 @@
-# Counter示例--单线程安全--多线程有问题
+# Counter示例--单线程安全--多线程时有问题
 add_executable(Counter_d 01.Counter.cc)
 target_link_libraries(Counter_d muduo_base)
 

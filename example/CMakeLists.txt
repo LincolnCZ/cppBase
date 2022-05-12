@@ -7,7 +7,6 @@ macro(add_example_target EXAMPLE_TARGET)
 endmacro(add_example_target)
 
 # test
-add_example_target(for_range)
 add_example_target(test)
 add_example_target(test2)
 add_example_target(test3)
@@ -19,12 +18,14 @@ target_link_libraries(example_md5_d crypto)
 # stl
 add_subdirectory(stl)
 
+# cpp11
+add_subdirectory(cpp11)
+
 # yy
 add_subdirectory(yy)
 
 # 其他测试项目
 add_subdirectory(batchWork)
-add_subdirectory(smart_pointer)
 
 # protobuf
 #if (PROTOBUF_FOUND)

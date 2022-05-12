@@ -6,7 +6,6 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/muduo)
 
 # 测试
-add_subdirectory(thread_test)
 add_subdirectory(reactor_test)
 
 # 网络库使用相关

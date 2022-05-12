@@ -7,6 +7,7 @@
 #include <list>
 #include <set>
 #include <unordered_set>
+#include <algorithm>
 
 using namespace std;
 
@@ -18,6 +19,13 @@ std::ostream &operator<<(std::ostream &ostr, const std::map<int, std::string> &m
 }
 
 std::ostream &operator<<(std::ostream &ostr, const std::vector<int> &vec) {
+    for (auto &i: vec) {
+        ostr << i << '\t';
+    }
+    return ostr;
+}
+
+std::ostream &operator<<(std::ostream &ostr, const std::vector<vector<int>> &vec) {
     for (auto &i: vec) {
         ostr << i << '\t';
     }
@@ -63,60 +71,60 @@ std::ostream &operator<<(std::ostream &ostr, const std::list<int> &list) {
 
 
 //weight: 物品重量，n: 物品个数，w: 背包可承载重量
-int knapsack(vector<int> &weight, int n, int w) {
+int knapsack(vector<int> &weight, vector<int> count, int n, int w) {
     //记录状态
-    vector<vector<bool>> dp(n, vector<bool>(w + 1, false));
+    vector<vector<int>> dp(n, vector<int>(w + 1));
     //第 0 个物品
-    for (int i = 0; i < w / weight[0]; ++i) {
-        dp[0][i * weight[0]] = true;
+    for (int i = 0; i < min(w / weight[0], count[i]); ++i) {
+        dp[0][i * weight[0]] = 1;
     }
     // 状态转移
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j <= w; ++j) {
-            int k = j / weight[i];
+            int k = min(j / weight[i], count[i]);
             for (int c = 0; c < k; ++c) {
-                if (dp[i - 1][j - c * weight[i]]) {
-                    dp[i][j] = true;
-                    break;
-                }
+                dp[i][j] += dp[i - 1][j - c * weight[i]];
             }
         }
     }
     // 返回结果
-    for (int j = w; j >= 0; --j) {
-        if (dp[n - 1][j]) return j;
-    }
-    return 0;
+    return dp[n - 1][w];
 }
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>> &triangle) {
+        int m = triangle.size();
+        vector<vector<int>> dp(m, vector<int>(m));
+        dp[0][0] = triangle[0][0];
+
+        for (int i = 1; i < m; ++i) {
+            dp[i][0] = dp[i - 1][0] + triangle[i][0];
+            for (int j = 1; j < i; ++j) {
+                dp[i][j] = min(dp[i - 1][j], dp[i - 1][j - 1]) + triangle[i][j];
+            }
+            dp[i][i] = dp[i - 1][i - 1] + triangle[i][i];
+        }
+
+        int result = INT32_MAX;
+        cout << dp << endl;
+        for (int j = 0; j < m; ++j) {
+            result = min(result, dp[m - 1][j]);
+        }
+        return result;
+    }
+};
 
 
 int main() {
-
+    vector<vector<int>> vec = {{2},
+                               {3, 4},
+                               {6, 5, 7},
+                               {4, 1, 8, 3}};
+    cout << vec << endl;
+    Solution s;
+    cout << s.minimumTotal(vec);
 }
-
-
-template<typename Signature>
-class SignalTrivial;
-
-// NOT thread safe !!!
-template<typename RET, typename... ARGS>
-class SignalTrivial<RET(ARGS...)> {
-public:
-    typedef std::function<void(ARGS...)> Functor;
-
-    void connect(Functor &&func) {
-        functors_.push_back(std::forward<Functor>(func));
-    }
-
-    void call(ARGS &&... args) {
-        for (const Functor &f: functors_) {
-            f(args...);
-        }
-    }
-
-private:
-    std::vector<Functor> functors_;
-};
 
 
 

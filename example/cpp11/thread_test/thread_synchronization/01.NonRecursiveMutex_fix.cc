@@ -33,24 +33,24 @@ MutexLock mutex;
 //    g_foos->push_back(f);
 //}
 
-// 错误一：直接修改 g_foos 所指的 FooListvoid
-// 结果：因为是直接 g_foos 中添加元素，导致 traverse 函数中 foos->end()一直更新，结果就是陷入死循环调用post()函数。
+/// 错误一：直接修改 g_foos 所指的 FooListvoid
+/// 结果：因为是直接 g_foos 中添加元素，导致 traverse 函数中 foos->end()一直更新，结果就是陷入死循环调用post()函数。
 //void post(const Foo& f){
 //    printf("post\n");
 //    MutexLockGuard lock(mutex);
 //    g_foos->push_back(f);
 //}
-//
-// 错误二：试图缩小临界区，把 copying 移出临界区
-// 结果：
-void post(const Foo& f){
+
+/// 错误二：试图缩小临界区，把 copying 移出临界区
+/// 结果：
+void post(const Foo &f) {
     printf("post\n");
     FooListPtr newFoos(new FooList(*g_foos));
     newFoos->push_back(f);
     MutexLockGuard lock(mutex);
-    g_foos=newFoos; // 或者 g_foos.swap(newFoos);
+    g_foos = newFoos; // 或者 g_foos.swap(newFoos);
 }
-//
+
 //// 错误三：把临界区拆成两个小的，把 copying 放到临界区之外
 //void post(const Foo& f){
 //    FooListPtr oldFoos;
@@ -63,7 +63,6 @@ void post(const Foo& f){
 //    MutexLockGuard lock(mutex);
 //    g_foos=newFoos; // 或者 g_foos.swap(newFoos);
 //}
-
 
 /// 在read端，用一个栈上局部FooListPtr变量当做“观察者”，它使得g_foos的引用计数增加。
 /// traverse()函数的临界区内只读了一次共享变量g_foos（这里多线程并发读写shared_ptr，因此必须用mutex保护），比原来的写法大为缩短。
@@ -94,6 +93,5 @@ int main() {
     Foo f;
     post(f);
     traverse();
-//    traverse();
 }
 
