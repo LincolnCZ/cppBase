@@ -5,3 +5,4 @@ macro(add_socket_target EXAMPLE_TARGET)
 endmacro(add_socket_target)
 
 add_socket_target(getaddrinfo)
+add_socket_target(tcpdump_impl)

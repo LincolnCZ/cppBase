@@ -45,4 +45,10 @@ std::unique_ptr<T, std::function<void(T *)>> make_unique(T *p, std::function<voi
     return std::unique_ptr<T, std::function<void(T *)>>(p, d);
 }
 
+template<typename T, class... Args> // 可变参数模板
+std::unique_ptr<T> make_unique(Args &&... args) { // 可变参数模板的入口参数
+    return std::unique_ptr<T>(
+            new T(std::forward<Args>(args)...));// 完美转发
+}
+
 UTILITY_NAMESPACE_END

@@ -15,7 +15,7 @@ public:
     /// 因为定义了 move-constructor， 所以 copy-constructor 和 operator assigment 默认是delete
 
     /// move-constructor
-    unique_ptr(unique_ptr &&other)  noexcept {
+    unique_ptr(unique_ptr &&other) noexcept {
         ptr_ = other.release();
     }
 
@@ -53,9 +53,10 @@ private:
 
 int main() {
     unique_ptr<shape> ptr1{create_shape(shape_type::circle)};
-    //unique_ptr<shape> ptr2{ptr1};             // 编译出错；因为没有定义copy-constructor
+    //unique_ptr<shape> ptr2 = ptr1;             // 编译出错；因为没有定义copy-constructor
+    //unique_ptr<shape> ptr2{ptr1};              // 编译出错；因为没有定义copy-constructor
     unique_ptr<shape> ptr3;
-//    ptr3 = ptr1;                             // 编译出错：因为没有定义 copy-assigment
-    ptr3 = std::move(ptr1);                  // OK
+    //ptr3 = ptr1;                               // 编译出错：因为没有定义 copy-assigment
+    ptr3 = std::move(ptr1);                   // OK
     unique_ptr<shape> ptr4{std::move(ptr3)};  // OK
 }

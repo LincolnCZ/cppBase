@@ -18,7 +18,7 @@ add_subdirectory(muduo)
 
 #-----------------------------------其他项目----------------------------------
 # example
-add_subdirectory(example)
+add_subdirectory(cpp-examples)
 
 # center_config
 #add_subdirectory(project/center_config)
@@ -40,3 +40,4 @@ add_subdirectory(project/data_structures_and_algorithms)
 #--------------------------------常用cmake 选项说明---------------------------
 # PROJECT_SOURCE_DIR：项目的根目录
 # CMAKE_CURRENT_SOURCE_DIR：cmake文件所在的目录
+# file(GLOB RTC_SRC ./rtc/* ./rtc/include/rtp/*) //扫描对应目录下的文件

@@ -13,13 +13,13 @@ void do_work(int id) {
 
     std::cout << "id : " << id << std::endl;
     std::cout << "\tinput :";
-    for (const auto i :input) {
+    for (const auto i: input) {
         std::cout << i << "\t";
     }
     std::cout << std::endl;
 
     std::cout << "\tresult :";
-    for (auto i:result) {
+    for (auto i: result) {
         std::cout << i << "\t";
     }
     std::cout << std::endl;

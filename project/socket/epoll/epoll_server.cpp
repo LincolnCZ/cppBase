@@ -10,8 +10,6 @@
 #include <sys/epoll.h>
 #include <cerrno>
 #include <pthread.h>
-#include <stdbool.h>
-
 
 // https://programmer.ink/think/epoll-for-linux-programming.html
 
@@ -116,7 +114,6 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
         }
     }
 }
-
 
 int main(int argc, char *argv[]) {
     if (argc <= 2) {

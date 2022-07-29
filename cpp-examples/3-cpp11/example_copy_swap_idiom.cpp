@@ -1,15 +1,26 @@
 ///对于一个函数来说，异常安全(https://en.cppreference.com/w/cpp/language/exceptions)被形式化为3个等级，从高到低依次为：
-///
-///* No-throw guarantee: 该函数确保不会抛出异常。注意这并不意味着该函数执行的过程中完全没有异常。如果它可以捕获所有可能的异常并进行处理，
+///  No-throw guarantee: 该函数确保不会抛出异常。注意这并不意味着该函数执行的过程中完全没有异常。如果它可以捕获所有可能的异常并进行处理，
 ///     那么也算这个安全级别。另一种达到该等级的方法是靠返回 bool 值来表示操作是否成功（只有当这个函数的失败也是“正常”的时候才有意义，不然只是
 ///     将异常的处理责任转嫁给了 caller. 和函数式编程中的 Maybe monad 一样）。
-///Strong exception safety： 该函数可能失败并抛出异常。但失败后程序的内部状态不发生变化（程序退回到调用函数之前的状态）。这个要求常见于
+///  Strong exception safety： 该函数可能失败并抛出异常。但失败后程序的内部状态不发生变化（程序退回到调用函数之前的状态）。这个要求常见于
 ///     对数据库的操作中。实现的方法：分离出可能抛出异常的部分作为一个单独的函数。在调用这个函数的时候用临时变量保存结果；如果一切正常再引入改变
 ///     （如文件读写、数据库操作等）。
-///Basic exception safety：该函数可能抛出异常，程序的状态也可能改变，但是不会发生 memory leak，或者使一个 object 处于非正常状态。例如
+///  Basic exception safety：该函数可能抛出异常，程序的状态也可能改变，但是不会发生 memory leak，或者使一个 object 处于非正常状态。例如
 ///     一个函数在 free 之前抛出异常了，则会出现 memory leak。
 ///
 ///我们这里讨论的 copy-swap-idiom 的目的是达到 avoiding code duplication, and providing a strong exception guarantee.
+///
+///【rule of three】【The Rule of Four (and a half)】
+///   https://en.cppreference.com/w/cpp/language/rule_of_three
+///   https://zh.cppreference.com/w/cpp/language/rule_of_three
+///   The Rule of Three）：如果你需要显式地声明一下三者中的一个：析构函数、拷贝构造函数或者是拷贝赋值操作符，那么你需要显式的声明所有这三者。
+///   The Rule of Four (and a half)：“The Rule of The Big Four (and a half)" states that if you implement one of
+///        The copy constructor
+///        The assignment operator
+///        The move constructor
+///        The destructor
+///        The swap function
+///      then you must have a policy about the others.
 
 #include <algorithm> // std::copy
 #include <cstddef> // std::size_t

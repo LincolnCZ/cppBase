@@ -16,10 +16,9 @@ add_executable(example_md5_d example_md5.cpp)
 target_link_libraries(example_md5_d crypto)
 
 # stl
-add_subdirectory(stl)
-
-# cpp11
-add_subdirectory(cpp11)
+add_subdirectory(1-basic)
+add_subdirectory(2-stl)
+add_subdirectory(3-cpp11)
 
 # yy
 add_subdirectory(yy)
