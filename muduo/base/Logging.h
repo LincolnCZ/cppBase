@@ -29,6 +29,7 @@ class Logger
   };
 
   // compile time calculation of basename of source file
+  /** 编译期计算来获得basename，避免运行期strrchr(3)开销，这里利用了gcc的内置函数。*/
   class SourceFile
   {
    public:

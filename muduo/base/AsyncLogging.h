@@ -65,7 +65,7 @@ class AsyncLogging : noncopyable
   const off_t rollSize_;
   muduo::Thread thread_;
   muduo::CountDownLatch latch_;
-  muduo::MutexLock mutex_;
+  muduo::MutexLock mutex_; // 保护下面 4 个数据成员
   muduo::Condition cond_ GUARDED_BY(mutex_);
   BufferPtr currentBuffer_ GUARDED_BY(mutex_); // 当前缓冲
   BufferPtr nextBuffer_ GUARDED_BY(mutex_);    // 预备缓冲

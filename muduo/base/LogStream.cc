@@ -43,6 +43,7 @@ const char digitsHex[] = "0123456789ABCDEF";
 static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");
 
 // Efficient Integer to String Conversions, by Matthew Wilson.
+/*int 转 string*/
 template<typename T>
 size_t convert(char buf[], T value)
 {
@@ -66,6 +67,7 @@ size_t convert(char buf[], T value)
   return p - buf;
 }
 
+/*转为十六进制字符串*/
 size_t convertHex(char buf[], uintptr_t value)
 {
   uintptr_t i = value;

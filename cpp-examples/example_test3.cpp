@@ -132,22 +132,8 @@ private:
     TrieNode *root;
 };
 
-/**
- * Your Trie object will be instantiated and called as such:
- * Trie* obj = new Trie();
- * obj->insert(word);
- * bool param_2 = obj->search(word);
- * bool param_3 = obj->startsWith(prefix);
- */
-
-
-
-
-
 int main() {
-    Solution s;
     vector<int> vec = {1, -1, 3, 4, 5, 6, 1};
-    cout << s.maxGap(vec);
 }
 
 
