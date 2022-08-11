@@ -12,56 +12,40 @@
 
 using namespace std;
 
-std::ostream &operator<<(std::ostream &ostr, const std::map<int, std::string> &m) {
+template<typename T>
+std::ostream &operator<<(std::ostream &ostr, const std::set<T> &m) {
+    for (auto &i: m) {
+        ostr << i << '\t';
+    }
+    return ostr;
+}
+
+template<typename K, typename V>
+std::ostream &operator<<(std::ostream &ostr, const std::map<K, V> &m) {
     for (auto &i: m) {
         ostr << "[" << i.first << "]=" << i.second << '\t';
     }
     return ostr;
 }
 
-std::ostream &operator<<(std::ostream &ostr, const std::vector<int> &vec) {
+template<typename T>
+std::ostream &operator<<(std::ostream &ostr, const std::vector<T> &vec) {
     for (auto &i: vec) {
         ostr << i << '\t';
     }
     return ostr;
 }
 
-std::ostream &operator<<(std::ostream &ostr, const std::vector<vector<int>> &vec) {
+template<typename T>
+std::ostream &operator<<(std::ostream &ostr, const std::vector<vector<T>> &vec) {
     for (auto &i: vec) {
         ostr << i << '\t';
     }
     return ostr;
 }
 
-std::ostream &operator<<(std::ostream &ostr, const std::vector<char> &vec) {
-    for (auto &i: vec) {
-        ostr << i << '\t';
-    }
-    return ostr;
-}
-
-std::ostream &operator<<(std::ostream &ostr, const std::vector<vector<char>> &vec) {
-    for (auto &i: vec) {
-        ostr << i << endl;
-    }
-    return ostr;
-}
-
-void printVec(vector<int> &vec) {
-    for (int i = 0; i < vec.size(); ++i) {
-        cout << vec[i] << '\t';
-    }
-    cout << endl;
-}
-
-void printVec(vector<string> &vec) {
-    for (int i = 0; i < vec.size(); ++i) {
-        cout << vec[i] << '\t';
-    }
-    cout << endl;
-}
-
-std::ostream &operator<<(std::ostream &ostr, const std::list<int> &list) {
+template<typename T>
+std::ostream &operator<<(std::ostream &ostr, const std::list<T> &list) {
     for (auto &i: list) {
         ostr << " " << i;
     }
@@ -133,7 +117,24 @@ private:
 };
 
 int main() {
-    vector<int> vec = {1, -1, 3, 4, 5, 6, 1};
+    static int index = 0;
+    map<string, string> testMap = {
+            {"1", "11"},
+            {"2", "22"}
+    };
+    cout << "map:" << testMap << endl;
+
+    set<string> testSet = {
+            "1", "2", "3"
+    };
+    cout << "set:" << testSet << endl;
+
+    vector<int> testVec = {1, 2, 3};
+    vector<vector<int>> testVec2 = {{1, 2},
+                                    {3, 4}};
+    cout << "vector:" << testVec << endl;
+    cout << "vector vector :" << testVec2 << endl;
+
 }
 
 

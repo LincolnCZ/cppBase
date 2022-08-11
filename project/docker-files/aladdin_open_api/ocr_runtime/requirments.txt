@@ -1,0 +1,7 @@
+shapely==1.7.1
+imgaug==0.4.0
+pyclipper==1.2.0
+lmdb==1.0.0
+tqdm==4.49.0
+numpy==1.19.2
+thrift==0.11.0

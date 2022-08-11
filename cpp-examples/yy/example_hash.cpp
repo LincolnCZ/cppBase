@@ -43,7 +43,7 @@ uint32_t hashChannelGroup(const string &channel, const std::set<uint32_t> &group
 }
 
 int main() {
-    set<uint32_t> groups{0, 1};
-    string channelId = "16719_0330070134_r1"; //    87103145
+    set<uint32_t> groups{0, 1, 2, 3, 4};
+    string channelId = "2806828531"; //    87103145
     cout << "hash chose : " << hashChannelGroup(channelId, groups);
 }

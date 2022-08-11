@@ -1,0 +1,12 @@
+kafka==1.3.5
+opencv-python==3.4.0.14
+pika==1.0.1
+Pillow==5.1.0
+requests==2.18.4
+scipy==1.1.0
+thriftpy==0.3.9
+numpy==1.17.2
+torch==1.0.1.post2
+gunicorn==19.8.1
+gunicorn_thrift==0.2.24
+torchvision==0.2.2

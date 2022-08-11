@@ -6,7 +6,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/muduo)
 
 # muduo库开发过程
-#add_subdirectory(reactor_test)
+add_subdirectory(reactor_test)
 
 # 网络库使用相关
 add_subdirectory(sudoku)

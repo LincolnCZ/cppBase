@@ -104,16 +104,17 @@ class EventLoop : muduo::noncopyable
 
   bool looping_; /* atomic */
   bool quit_; /* atomic */
-  bool callingPendingFunctors_; /* atomic */
   const pid_t threadId_;
   Timestamp pollReturnTime_;
   boost::scoped_ptr<Poller> poller_;
   boost::scoped_ptr<TimerQueue> timerQueue_;
+  ChannelList activeChannels_;
+
+  bool callingPendingFunctors_; /* atomic */
   int wakeupFd_;
   // unlike in TimerQueue, which is an internal class,
   // we don't expose Channel to client.
   boost::scoped_ptr<Channel> wakeupChannel_;
-  ChannelList activeChannels_;
   MutexLock mutex_;
   std::vector<Functor> pendingFunctors_; // @GuardedBy mutex_
 };

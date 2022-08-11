@@ -1,0 +1,6 @@
+opencv_contrib_python==4.2.0.34
+numpy==1.18.5
+thrift==0.11.0
+onnx==1.7.0
+onnxruntime==1.5.2
+pycuda==2019.1.2

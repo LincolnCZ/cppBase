@@ -14,6 +14,7 @@ target_link_libraries(s03_test3_d muduo_base)
 add_executable(s03_test4_d tests/test4.cc ${REACTOR_s03_SRC})
 target_link_libraries(s03_test4_d muduo_base)
 
+# test5.cc 是单线程程序，测试了 runInLoop() 和 queueInLoop() 等新函数。
 add_executable(s03_test5_d tests/test5.cc ${REACTOR_s03_SRC})
 target_link_libraries(s03_test5_d muduo_base)
 

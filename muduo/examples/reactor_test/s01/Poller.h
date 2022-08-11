@@ -25,6 +25,8 @@ class Channel;
 /// IO Multiplexing with poll(2).
 ///
 /// This class doesn't own the Channel objects.
+/**Poller 是 EventLoop 的间接成员，只供其 owner EventLoop 在 IO 线程调用，因此无须加锁。其生命期与 EventLoop 相等。
+ * Poller 并不拥有 Channel，Channel 在析构之前必须自己 unregister（EventLoop::removeChannel()），避免空悬指针。*/
 class Poller : muduo::noncopyable
 {
  public:
@@ -48,7 +50,7 @@ class Poller : muduo::noncopyable
                           ChannelList* activeChannels) const;
 
   typedef std::vector<struct pollfd> PollFdList;
-  typedef std::map<int, Channel*> ChannelMap;
+  typedef std::map<int, Channel*> ChannelMap; // fd->
 
   EventLoop* ownerLoop_;
   PollFdList pollfds_;

@@ -16,6 +16,8 @@ using namespace muduo;
 
 __thread EventLoop* t_loopInThisThread = 0;
 
+/**EventLoop 的构造函数会记住本对象所属的线程（threadId_）。
+ * 创建了 EventLoop 对象的线程是 IO 线程，其主要功能是运行事件循环 EventLoop::loop()。*/
 EventLoop::EventLoop()
   : looping_(false),
     threadId_(CurrentThread::tid())
