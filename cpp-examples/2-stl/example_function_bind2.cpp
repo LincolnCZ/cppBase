@@ -28,7 +28,7 @@ namespace test1 {
         TestPtr ptr(new Test);
         std::cout << "main ptr count:" << ptr.use_count() << std::endl;
 
-        /// 使用std::placeholders(占位符)的形式占位，从_1开始，依次递增，是以引用传递的形式；
+        /// 使用 std::placeholders (占位符)的形式占位，从 _1 开始，依次递增，是以引用传递的形式；
         FuncRef funcRef;
         {
             funcRef = std::bind(&Foo::print, &f, _1, _2);
@@ -39,13 +39,13 @@ namespace test1 {
         FuncVal funcVal;
         {
             std::string str("world");
-            funcVal = std::bind(&Foo::print, &f, ptr, str); // 预绑定参数以值传递方式，所以ptr引用增加1, str 也会进行拷贝
+            funcVal = std::bind(&Foo::print, &f, ptr, str); // 预绑定参数以值传递方式，所以 ptr 引用增加 1, str 也会进行拷贝
         }
         funcVal();
     }
 }
 
-/// 说明bind 拷贝的是实参类型(const char*)，不是形参类型(string)
+/// 说明 bind 拷贝的是实参类型(const char*)，不是形参类型(string)
 namespace test2 {
     class Foo {
     public:
@@ -79,7 +79,7 @@ namespace test2 {
         f1(); // 调用 foo.methodString("hello")
         /// 注意，bind 拷贝的是实参类型(const char*)，不是形参类型(string)
         /// 这里形参中的 string 对象的构造发生在调用 f1 的时候，而非 bind 的时候，
-        /// 因此要留意bind的实参(cosnt char*)的生命期，它应该不短于f1的生命期。
+        /// 因此要留意 bind 的实参(cosnt char*)的生命期，它应该不短于f1的生命期。
         /// 必要时可通过 bind(&Foo::methodString, &foo, string(aTempBuf)) 来保证安全
 
         std::function<void(int)> f2; // int 参数，无返回值

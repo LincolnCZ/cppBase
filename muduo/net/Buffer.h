@@ -24,6 +24,45 @@
 #include <string.h>
 //#include <unistd.h>  // ssize_t
 
+/**为什么 non-blocking 网络编程中应用层 buffer 是必需的*/
+/*
+non-blocking IO 的核心思想是避免阻塞在 read() 或 write() 或其他 IO 系统调用上，这样可以最大限度地复用 thread-of-control，让一个线程能
+    服务于多个 socket 连接。IO 线程只能阻塞在 IO multiplexing 函数上，如select/poll/epoll_wait。这样一来，应用层的缓冲是必需的，每个
+    TCP socket 都要有 stateful 的input buffer和output buffer。
+（1）TcpConnection 必须要有 output buffer　
+   考虑一个常见场景：程序想通过 TCP 连接发送 100kB 的数据，但是在 write() 调用中，操作系统只接受了 80kB（受 TCP advertised window 的
+      控制，细节见[TCPv1]），你肯定不想在原地等待，因为不知道会等多久（取决于对方什么时候接收数据，然后滑动 TCP 窗口）。程序应该尽快交出控制权，
+      返回 event loop。在这种情况下，剩余的 20kB 数据怎么办？
+   对于应用程序而言，它只管生成数据，它不应该关心到底数据是一次性发送还是分成几次发送，这些应该由网络库来操心，程序只要调用 TcpConnection::send()
+      就行了，网络库会负责到底。网络库应该接管这剩余的 20kB 数据，把它保存在该 TCPconnection 的 output buffer 里，然后注册 POLLOUT 事件，
+      一旦 socket 变得可写就立刻发送数据。当然，这第二次 write() 也不一定能完全写入 20kB，如果还有剩余，网络库应该继续关注 POLLOUT 事件；如果写
+      完了 20kB，网络库应该停止关注 POLLOUT，以免造成 busy loop。（muduoEventLoop 采用的是 epoll leveltrigger，原因见下页。）
+   如果程序又写入了 50kB，而这时候 output buffer 里还有待发送的 20kB 数据，那么网络库不应该直接调用 write()，而应该把这 50kB 数据 append
+      在那 20kB 数据之后，等 socket 变得可写的时候再一并写入。
+   如果 output buffer 里还有待发送的数据，而程序又想关闭连接（对程序而言，调用TcpConnection::send()之后他就认为数据迟早会发出去），那么这时
+      候网络库不能立刻关闭连接，而要等数据发送完毕，见§7.2“为什么 TcpConnection:: shutdown() 没有直接关闭 TCP 连接”中的讲解。
+   综上，要让程序在 write 操作上不阻塞，网络库必须要给每个 TCP connection 配置 output buffer。
+（2）TcpConnection 必须要有 input buffer　
+   TCP 是一个无边界的字节流协议，接收方必须要处理“收到的数据尚不构成一条完整的消息”和“一次收到两条消息的数据”等情况。一个常见的场景是，发送方
+      send() 了两条 1kB 的消息（共 2kB），接收方收到数据的情况可能是：
+    • 一次性收到 2kB 数据；
+    • 分两次收到，第一次 600B，第二次 1400B；
+    • 分两次收到，第一次 1400B，第二次 600B；
+    • 分两次收到，第一次 1kB，第二次 1kB；
+    • 分三次收到，第一次 600B，第二次 800B，第三次 600B；
+    • 其他任何可能。一般而言，长度为 n 字节的消息分块到达的可能性有种。
+   网络库在处理“socket 可读”事件的时候，必须一次性把 socket 里的数据读完（从操作系统 buffer 搬到应用层 buffer），否则会反复触发 POLLIN 事件，
+      造成 busy-loop。那么网络库必然要应对“数据不完整”的情况，收到的数据先放到 input buffer 里，等构成一条完整的消息再通知程序的业务逻辑。这通
+      常是 codec 的职责，见 §7.3“Boost.Asio 的聊天服务器”中的“ TCP 分包”的论述与代码。所以，在 TCP 网络编程中，网络库必须要给每个 TCP connection
+      配置 input buffer。
+muduo EventLoop 采用的是 epoll(4)level trigger，而不是 edge trigger。一是为了与传统的 poll(2) 兼容，因为在文件描述符数目较少，活动文件
+   描述符比例较高时，epoll(4)不见得比poll(2)更高效，必要时可以在进程启动时切换 Poller。二是 level trigger 编程更容易，以往
+   select(2)/poll(2) 的经验都可以继续用，不可能发生漏掉事件的 bug。三是读写的时候不必等候出现 EAGAIN，可以节省系统调用次数，降低延迟。
+所有 muduo 中的 IO 都是带缓冲的 IO（buffered IO），你不会自己去 read() 或 write() 某个 socket，只会操作 TcpConnection 的 input buffer
+   和 output buffer。更确切地说，是在 onMessage() 回调里读取 input buffer；调用 TcpConnection::send() 来间接操作 output buffer，一般
+   不会直接操作 output buffer。
+*/
+
 namespace muduo
 {
 namespace net
@@ -39,6 +78,9 @@ namespace net
 /// |                   |                  |                  |
 /// 0      <=      readerIndex   <=   writerIndex    <=     size
 /// @endcode
+///
+/**Buffer 仿 NettyChannelBuffer 的 bufferclass，数据的读写通过 buffer 进行。
+ *   用户代码不需要调用 read(2)/write(2)，只需要处理收到的数据和准备好要发送的数据。*/
 class Buffer : public muduo::copyable
 {
  public:

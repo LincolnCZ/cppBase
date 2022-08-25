@@ -103,7 +103,7 @@ void TcpConnection::send(const StringPiece& message)
       loop_->runInLoop(
           std::bind(fp,
                     this,     // FIXME
-                    message.as_string()));
+                    message.as_string())); /**message 发生了拷贝*/
                     //std::forward<string>(message)));
     }
   }
@@ -125,7 +125,7 @@ void TcpConnection::send(Buffer* buf)
       loop_->runInLoop(
           std::bind(fp,
                     this,     // FIXME
-                    buf->retrieveAllAsString()));
+                    buf->retrieveAllAsString())); /**message 发生了拷贝*/
                     //std::forward<string>(message)));
     }
   }
@@ -344,6 +344,8 @@ void TcpConnection::connectDestroyed()
   channel_->remove();
 }
 
+/**Timestamp 是 poll(2) 返回的时刻，即消息到达的时刻，这个时刻早于读到数据的时刻（read(2)调用或返回）。因此如果要比较准确地测量程序处理消息
+ *    的内部延迟，应该以此时刻为起点，否则测出来的结果偏小，特别是处理并发连接时效果更明显。*/
 void TcpConnection::handleRead(Timestamp receiveTime)
 {
   loop_->assertInLoopThread();
@@ -355,6 +357,7 @@ void TcpConnection::handleRead(Timestamp receiveTime)
   }
   else if (n == 0)
   {
+    /**对端关闭连接*/
     handleClose();
   }
   else

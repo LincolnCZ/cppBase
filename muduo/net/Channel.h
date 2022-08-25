@@ -30,6 +30,10 @@ class EventLoop;
 /// This class doesn't own the file descriptor.
 /// The file descriptor could be a socket,
 /// an eventfd, a timerfd, or a signalfd
+/**每个 Channel 对象自始至终只属于一个 EventLoop，因此每个 Channel 对象都只属于某一个 IO 线程。每个 Channel 对象自始至终只负责一个文件
+ * 描述符（fd）的 IO 事件分发，但它并不拥有这个 fd，也不会在析构的时候关闭这个 fd。Channel 会把不同的 IO 事件分发为不同的回调。
+ * Channel 的生命期由其 owner class 负责管理，它一般是其他 class 的直接或间接成员。
+ * */
 class Channel : noncopyable
 {
  public:

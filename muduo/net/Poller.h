@@ -59,7 +59,7 @@ class Poller : noncopyable
 
  protected:
   typedef std::map<int, Channel*> ChannelMap;
-  ChannelMap channels_;
+  ChannelMap channels_; /**fd -> */
 
  private:
   EventLoop* ownerLoop_;

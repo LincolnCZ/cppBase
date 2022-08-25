@@ -22,6 +22,9 @@ namespace net
 
 class EventLoop;
 
+/**EventLoopThread 会启动自己的线程，并在其中运行 EventLoop::loop().
+ *  IO 线程不一定是主线程，我们可以在任何一个线程创建并运行 EventLoop。一个程序也可以有不止一个 IO 线程，我们可以按优先级将不同的 socket
+ *    分给不同的 IO 线程，避免优先级反转。为了方便将来使用，我们定义 EventLoopThread class，这正是 one loop per thread 的本意。*/
 class EventLoopThread : noncopyable
 {
  public:

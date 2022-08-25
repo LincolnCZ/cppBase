@@ -27,6 +27,9 @@ class InetAddress;
 ///
 /// Acceptor of incoming TCP connections.
 ///
+/**Acceptor 是内部 class，供 TcpServer 使用，生命期由后者控制。
+ * Accepto r的构造函数和 Acceptor::listen() 成员函数执行创建 TCP 服务端的传统步骤，即调用 socket(2)、bind(2)、listen(2) 等
+ *   Sockets API，其中任何一个步骤出错都会造成程序终止，因此这里看不到错误处理。*/
 class Acceptor : noncopyable
 {
  public:

@@ -140,22 +140,25 @@ class EventLoop : noncopyable
   bool looping_; /* atomic */
   std::atomic<bool> quit_;
   bool eventHandling_; /* atomic */
-  bool callingPendingFunctors_; /* atomic */
   int64_t iteration_;
   const pid_t threadId_;
   Timestamp pollReturnTime_;
+  /**Poller 是 EventLoop 的间接成员，只供其 owner EventLoop 在 IO 线程调用，因此无须加锁。其生命期与 EventLoop 相等。
+   * Poller 并不拥有 Channel，Channel 在析构之前必须自己 unregister（EventLoop::removeChannel()），避免空悬指针。*/
   std::unique_ptr<Poller> poller_;
   std::unique_ptr<TimerQueue> timerQueue_;
-  int wakeupFd_;
-  // unlike in TimerQueue, which is an internal class,
-  // we don't expose Channel to client.
-  std::unique_ptr<Channel> wakeupChannel_;
-  boost::any context_;
 
   // scratch variables
   ChannelList activeChannels_;
   Channel* currentActiveChannel_;
 
+  /**runInLoop 相关*/
+  bool callingPendingFunctors_; /* atomic */
+  int wakeupFd_;
+  // unlike in TimerQueue, which is an internal class,
+  // we don't expose Channel to client.
+  std::unique_ptr<Channel> wakeupChannel_;
+  boost::any context_;
   mutable MutexLock mutex_;
   std::vector<Functor> pendingFunctors_ GUARDED_BY(mutex_);
 };

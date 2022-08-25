@@ -30,6 +30,19 @@ class EventLoopThreadPool;
 /// TCP server, supports single-threaded and thread-pool models.
 ///
 /// This is an interface class, so don't expose too much details.
+/**TcpServer 用于编写网络服务器，接受客户的连接。
+ * TcpServer class 的功能是管理accept(2)获得的 TcpConnection。TcpServer 是供用户直接使用的，生命期由用户控制。
+ * TcpServer 内部使用 Acceptor 来获得新连接的 fd。它保存用户提供的 ConnectionCallback 和 MessageCallback，在新建 TcpConnection 的时候会
+ *   原样传给后者。TcpServer 持有目前存活的 TcpConnection 的 shared_ptr（定义为TcpConnectionPtr），因为 TcpConnection 对象的生命期是模糊的，
+ *   用户也可以持有 TcpConnectionPtr。
+ *
+ * 多线程 TcpServer：
+ *   用 one loop per thread 的思想实现多线程 TcpServer 的关键步骤是在新建 TcpConnection 时从 event loop pool 里挑选一个 loop 给
+ *      TcpConnection 用。也就是说多线程 TcpServer 自己的 EventLoop 只用来接受新连接，而新连接会用其他 EventLoop 来执行 IO。（单线程
+ *      TcpServer 的 EventLoop 是与 TcpConnection 共享的。）muduo 的 event loop pool 由 EventLoopThreadPoolclass 表示。
+ *   总而言之，TcpServer 和 TcpConnection 的代码都只处理单线程的情况（甚至都没有 mutex 成员），而我们借助EventLoop::runInLoop() 并引入
+ *      EventLoopThreadPool 让多线程 TcpServer 的实现易如反掌。
+ *   */
 class TcpServer : noncopyable
 {
  public:

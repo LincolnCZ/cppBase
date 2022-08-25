@@ -103,6 +103,9 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn)
   loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
 }
 
+/**因为 TcpConnection 会在自己的 ioLoop 线程调用 removeConnection()，所以需要把它移到 TcpServer 的 loop_ 线程（因为 TcpServer 是无锁的）。
+ *   再把 connectDestroyed() 移到 TcpConnection 的 ioLoop 线程进行，是为了保证 TcpConnection 的 ConnectionCallback 始终在其 ioLoop 回调，
+ *   方便客户端代码的编写。*/
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
   loop_->assertInLoopThread();

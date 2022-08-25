@@ -175,6 +175,17 @@ void EventLoop::handleRead()
   }
 }
 
+/**
+ *（1）EventLoop::doPendingFunctors() 不是简单地在临界区内依次调用 Functor，而是把回调列表 swap() 到局部变量 functors 中，
+ *  这样一方面减小了临界区的长度（意味着不会阻塞其他线程调用 queueInLoop() ），另一方面也避免了死锁（因为 Functor 可能再调用 queueInLoop() ）。
+ *（2）由于 doPendingFunctors() 调用的 Functor 可能再调用 queueInLoop(cb)，这时 queueInLoop() 就必须 wakeup()，否则这些新加的 cb 就不能
+ *  被及时调用了。muduo 这里没有反复执行 doPendingFunctors() 直到 pendingFunctors_ 为空，这是有意的，否则 IO 线程有可能陷入死循环，无法处理 IO 事件。
+ *（3）注意 muduo 不是在EventLoop::handleRead() 中执行 doPendingFunctors()
+ *  一个是节省系统调用，试想一下如果 doPendingFunctors() 放到 EventLoop::handleRead() 中，就必须调用 weakup()，这样流程就涉及三个
+ *  系统调用 write->poll->read。在 IO 线程内注册回调函数这种情况下，其用不着花费三个系统。因为注册回调函数这个动作本身也是被回调的，也就是
+ *  说 EventLoop::loop() 里面循环调用完 handleEvent（）后（这时注册回调函数这个动作已完成），就可以立马调用doPendingFunctors（）去处
+ *  理回调了，省略三次系统调用时间；另一个是我觉得 pendingFunctors 优先级低于其他事件。
+ */
 void EventLoop::doPendingFunctors()
 {
   std::vector<Functor> functors;

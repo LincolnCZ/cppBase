@@ -135,6 +135,8 @@ int main() {
     cout << "vector:" << testVec << endl;
     cout << "vector vector :" << testVec2 << endl;
 
+    int flag = 131 | 1;
+    cout << flag << endl;
 }
 
 

@@ -9,21 +9,24 @@
 ///   auto&& a = expr; 意味着用 expr 去匹配一个假想的 template <typename T> f(T&&) 函数模板，根据转发引用和引用坍缩规则，结果是
 ///      一个跟 expr 值类别相同的引用类型。
 
-std::ostream &operator<<(std::ostream &oStr, const std::vector<int> &vec) {
+template<typename T>
+std::ostream &operator<<(std::ostream &oStr, const std::vector<T> &vec) {
     for (const auto &i: vec) {
         oStr << i << ' ';
     }
     return oStr;
 }
 
-std::ostream &operator<<(std::ostream &oSstr, const std::map<int, std::string> &m) {
+template<typename K, typename V>
+std::ostream &operator<<(std::ostream &oStr, const std::map<K, V> &m) {
     for (const auto &i: m) {
-        oSstr << i.first << " " << i.second << "\n";
+        oStr << i.first << " " << i.second << "\n";
     }
-    return oSstr;
+    return oStr;
 }
 
-std::ostream &operator<<(std::ostream &oStr, const std::set<std::string> &s) {
+template<typename T>
+std::ostream &operator<<(std::ostream &oStr, const std::set<T> &s) {
     for (const auto &i: s) {
         oStr << i << ' ';
     }
@@ -49,8 +52,8 @@ void test_vector() {
     }
     std::cout << '\n';
 
-    for (const auto &n: {0, 1, 2, 3, 4, 5}) // the initializer may be a braced-init-list
-        std::cout << n << ' ';
+    for (const auto &i: {0, 1, 2, 3, 4, 5}) // the initializer may be a braced-init-list
+        std::cout << i << ' ';
     std::cout << '\n';
 
     std::cout << "---change value---" << std::endl;

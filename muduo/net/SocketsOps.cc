@@ -112,6 +112,9 @@ void sockets::listenOrDie(int sockfd)
   }
 }
 
+/**这里区分致命错误和暂时错误，并区别对待。
+ * 对于暂时错误，例如 EAGAIN、EINTR、EMFILE、ECONNABORTED 等等，处理办法是忽略这次错误。
+ * 对于致命错误，例如 ENFILE、ENOMEM 等等，处理办法是终止程序，对于未知错误也照此办理。*/
 int sockets::accept(int sockfd, struct sockaddr_in6* addr)
 {
   socklen_t addrlen = static_cast<socklen_t>(sizeof *addr);
