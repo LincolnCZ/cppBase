@@ -138,11 +138,3 @@ int main() {
     int flag = 131 | 1;
     cout << flag << endl;
 }
-
-
-
-
-
-
-
-
