@@ -9,7 +9,7 @@ endmacro(add_example_target)
 # test
 add_example_target(test)
 add_example_target(test2)
-add_example_target(test3)
+add_example_target(test3)external_mail.json
 
 # md5
 add_executable(example_md5_d example_md5.cpp)
