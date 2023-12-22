@@ -6,10 +6,9 @@ macro(add_example_target EXAMPLE_TARGET)
     target_link_libraries("example_${EXAMPLE_TARGET}" pthread)
 endmacro(add_example_target)
 
-# test
 add_example_target(test)
 add_example_target(test2)
-add_example_target(test3)external_mail.json
+add_example_target(test3)
 
 # md5
 add_executable(example_md5_d example_md5.cpp)
@@ -31,3 +30,7 @@ add_subdirectory(batchWork)
 #    add_subdirectory(protobuf_test)
 #endif ()
 add_subdirectory(protobuf_test)
+
+add_subdirectory(4-coredump)
+
+add_subdirectory(mail)

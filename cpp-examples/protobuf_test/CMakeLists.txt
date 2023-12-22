@@ -1,6 +1,7 @@
 include_directories(/usr/include)
 
-set(PROTOBUF_DIR ${PROJECT_SOURCE_DIR}/3rd/protobuf-3.19.0)
+#set(PROTOBUF_DIR ${PROJECT_SOURCE_DIR}/3rd/protobuf-3.19.0)
+set(PROTOBUF_DIR /usr/local/Cellar/protobuf/21.11)
 
 if(protobuf_VERBOSE)
     message(STATUS "Using Protocol Buffers ${protobuf_VERSION}")

@@ -1,13 +1,16 @@
 // Filename: addressbook.proto //这一行是注释，语法类似于C++
 
 syntax = "proto2"; //表明使用protobuf的编译器版本为v2
-package addressbook; //声明了一个包名，用来防止不同的消息类型命名冲突，类似于 namespace
+package tutorial; //声明了一个包名，用来防止不同的消息类型命名冲突，类似于 namespace
 
 //import "src/help.proto"; //导入了一个外部proto文件中的定义，类似于C++中的 include 。
+message BookInfo{
+  optional bytes title = 1;
+}
 
 message Person {
   required string name = 1;
-  required int32 id = 2;
+  required int32 id = 2;// Unique ID number for this person.
   optional string email = 3;
 
   enum PhoneType {
@@ -25,5 +28,17 @@ message Person {
 }
 
 message AddressBook {
-  repeated Person person_info = 1;
+  optional BookInfo book_info = 1;
+  repeated Person person_info = 2;
+}
+
+message Src{
+  optional uint32 f1 = 1;
+  optional bytes f2 = 2;
+}
+
+message Dst {
+  optional uint32 f1 = 1;
+  optional bytes f2 = 2;
+//  optional string f3 = 3;
 }

@@ -1,0 +1,5 @@
+add_executable(static_str_d static_str.cpp)
+add_executable(this_virtual_pointer_d this_virtual_pointer.cpp)
+
+add_executable(multi_thread_dump_d multi_thread_dump.cpp)
+target_link_libraries(multi_thread_dump_d pthread)

@@ -30,12 +30,12 @@ add_subdirectory(cpp-examples)
 #add_subdirectory(project/design_pattern)
 
 # socket test
-add_subdirectory(project/socket)
+#add_subdirectory(project/socket)
 
 # ffmpeg_tutorial
 #add_subdirectory(project/ffmpeg_tutorial)
 
-add_subdirectory(project/data_structures_and_algorithms)
+#add_subdirectory(project/data_structures_and_algorithms)
 
 #--------------------------------常用cmake 选项说明---------------------------
 # PROJECT_SOURCE_DIR：项目的根目录

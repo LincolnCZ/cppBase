@@ -1,49 +1,84 @@
 #include <iostream>
 #include "addressbook.pb.h"
 
+using namespace tutorial;
+using namespace std;
+
+// 直接使用 copyFrom 是有问题的，即使src和dst的定义完全一致也是有问题的。
+// CopyFrom 只适用于同一定义之间
+void testCopyFromError() {
+    Src src;
+    src.set_f1(123);
+    src.set_f2("hello");
+    cout << "src:" << src.DebugString() << endl;
+    Dst dst; //如果使用Src dst，则可以
+    dst.CopyFrom(src);
+//    dst.set_f3("world");
+    cout << "dst:" << dst.DebugString() << endl;
+}
+
 int main(int argc, const char *argv[]) {
     //--------------------------------------------------------------------
     //初始化并序列化
-    addressbook::AddressBook addr_book;
-    addressbook::Person *p_per = addr_book.add_person_info();//增加结点
+    AddressBook addr_book;
+    auto book_info = addr_book.mutable_book_info(); //成员是message
+    book_info->set_title("tutorial address book");
 
-    p_per->set_name("lcz");
-    p_per->set_id(1219);
-    std::cout << "before clear(), id = " << p_per->id() << std::endl;
-    p_per->clear_id();
-    std::cout << "after clear(), id = " << p_per->id() << std::endl;
-    p_per->set_id(1087);
-    if (!p_per->has_email())
-        p_per->set_email("lcz@qq.com");
+    //增加Person结点
+    Person *pPerson = addr_book.add_person_info(); //成员是repeated message
+    //Person *pPerson = addr_book.mutable_person_info(0);//有问题的写法，访问越界
+    pPerson->set_name("lcz");
+    pPerson->set_id(123);
+    pPerson->set_email("lcz@qq.com");
 
-    addressbook::Person::PhoneNumber *p_per_phonenum = p_per->add_phone();//增加结点
-    p_per_phonenum->set_number("021-8888-8888");
-    //增加另一个结点
-    p_per_phonenum = p_per->add_phone();
-    p_per_phonenum->set_number("138-8888-8888");
-    p_per_phonenum->set_type(addressbook::Person::MOBILE);
+    //增加PhoneNumber节点1
+    Person::PhoneNumber *pPersonPhonenum = pPerson->add_phone();
+    pPersonPhonenum->set_number("021-8888-8888");
+    //增加PhoneNumber节点2
+    pPersonPhonenum = pPerson->add_phone();
+    pPersonPhonenum->set_number("138-8888-8888");
+    pPersonPhonenum->set_type(Person::MOBILE);
 
-    uint32_t size = addr_book.ByteSize();////获取二进制字节序的大小
+    uint32_t size = addr_book.ByteSize();//获取二进制字节序的大小
     unsigned char byteArray[size];
     addr_book.SerializeToArray(byteArray, size);//序列化函数：输出到字节流
 
+//	//test
+//	{
+//		cout << "before" << addr_book.DebugString() << endl;
+//		addr_book.person_info(0).set_name("test");
+//		cout << "after" << addr_book.DebugString() << endl;
+//	}
+
+
     //--------------------------------------------------------------------------
     //以下对应的是解析了
-    addressbook::AddressBook help_addr_book;
+    AddressBook help_addr_book;
     help_addr_book.ParseFromArray(byteArray, size);//反序列化函数：从字节流解析
-    addressbook::Person help_per = help_addr_book.person_info(0);
 
-    std::cout << "*****************************" << std::endl;
-    std::cout << "id: " << help_per.id() << std::endl;
-    std::cout << "name: " << help_per.name() << std::endl;
-    std::cout << "email: " << help_per.email() << std::endl;
+    cout << "***********book info******************" << endl;
+    // 指针访问，适用用修改
+    //auto help_book_info = help_addr_book.mutable_book_info();
+    //cout << "title: " << help_book_info->title() << endl;
+    //const 引用访问，只读
+    auto help_book_info = help_addr_book.book_info();
+    cout << "title: " << help_book_info.title() << endl;
 
-    for (int i = 0; i < help_per.phone_size(); ++i) {
-        addressbook::Person::PhoneNumber *help_pn = help_per.mutable_phone(i);
-        std::cout << "phone_type: " << help_pn->type() << std::endl;
-        std::cout << "phone_number: " << help_pn->number() << std::endl;
+    cout << "***********person info******************" << endl;
+    for (int i = 0; i < help_addr_book.person_info_size(); ++i) {
+        Person help_per = help_addr_book.person_info(i);
+        cout << "id: " << help_per.id() << endl;
+        cout << "name: " << help_per.name() << endl;
+        cout << "email: " << help_per.email() << endl;
+
+        for (int j = 0; j < help_per.phone_size(); ++j) {
+            Person::PhoneNumber *help_pn = help_per.mutable_phone(j);
+            cout << "phone_type: " << help_pn->type() << endl;
+            cout << "phone_number: " << help_pn->number() << endl;
+        }
     }
-    std::cout << "*****************************" << std::endl;
+
+//    testCopyFromError();
 
     return 0;
 }
